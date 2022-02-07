@@ -6,12 +6,21 @@
 trigger:
 - master
 
+
+
 pool:
   vmImage: ubuntu-latest
 
 variables:
   buildConfiguration: 'Release'
 
-steps:
-- script: dotnet build --configuration $(buildConfiguration)
+jobs:
+- job: buildJob
+  steps:
+  - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
+
+- job: deployJob
+  steps:
+  - bash: echo "Need to deploy still"
+
