@@ -6,35 +6,24 @@
 trigger:
 - master
 
-
-
-pool:
-  vmImage: ubuntu-latest
-
 variables:
   buildConfiguration: 'Release'
 
-jobs:
-- job: buildJob
-  displayName: buildjob
-  steps:
-  - task: DotNetCoreCLI@2
-    inputs:
-      command: 'build'
-      projects: 'pipelines-dotnet-core.csproj'
+steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '<Azure service connection>'
+    appType: 'webAppLinux'
+    appName: 'SamplePipelineTH'
+    package: '$(System.DefaultWorkingDirectory)/**/*.zip'
 
 
-  # - script: dotnet build --configuration $(buildConfiguration)
-  # displayName: 'dotnet build $(buildConfiguration)'
 
-- job: deployJob
-  displayName: My Deployment Job
-  steps:
-  - task: AzureWebApp@1
-    inputs:
-      azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
-      appType: 'webAppLinux'
-      appName: 'SamplePipelineTH'
-      package: '$(System.DefaultWorkingDirectory)/**/*.zip'
 
 
