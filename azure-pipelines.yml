@@ -21,6 +21,13 @@ jobs:
   displayName: 'dotnet build $(buildConfiguration)'
 
 - job: deployJob
+  displayName: My Deployment Job
   steps:
-  - bash: echo "Need to deploy still"
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
+      appType: 'webAppLinux'
+      appName: 'SamplePipeline'
+      package: '$(System.DefaultWorkingDirectory)/**/*.zip'
+
 
