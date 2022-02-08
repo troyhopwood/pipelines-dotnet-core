@@ -21,7 +21,7 @@ jobs:
   - task: DotNetCoreCLI@2
     inputs:
       command: 'build'
-      projects: '/pipelines-dotnet-core.csproj'
+      projects: '*/pipelines-dotnet-core.csproj'
 
 
   # - script: dotnet build --configuration $(buildConfiguration)
