@@ -16,11 +16,12 @@ variables:
 
 jobs:
 - job: buildJob
+  displayName: buildjob
   steps:
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
-    projects: '/pipelines-dotnet-core.csproj'
+  - task: DotNetCoreCLI@2
+    inputs:
+      command: 'build'
+      projects: '/pipelines-dotnet-core.csproj'
 
 
   # - script: dotnet build --configuration $(buildConfiguration)
