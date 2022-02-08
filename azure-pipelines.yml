@@ -17,8 +17,14 @@ variables:
 jobs:
 - job: buildJob
   steps:
-  - script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '/pipelines-dotnet-core.csproj'
+
+
+  # - script: dotnet build --configuration $(buildConfiguration)
+  # displayName: 'dotnet build $(buildConfiguration)'
 
 - job: deployJob
   displayName: My Deployment Job
