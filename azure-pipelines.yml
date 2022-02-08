@@ -27,7 +27,7 @@ jobs:
     inputs:
       azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
       appType: 'webAppLinux'
-      appName: 'SamplePipeline'
+      appName: 'SamplePipelineTH'
       package: '$(System.DefaultWorkingDirectory)/**/*.zip'
 
 
