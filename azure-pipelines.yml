@@ -18,12 +18,10 @@ steps:
     publishWebProjects: true
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: '<Azure service connection>'
+    azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
     appType: 'webAppLinux'
     appName: 'SamplePipelineTH'
     package: '$(System.DefaultWorkingDirectory)/**/*.zip'
-
-
 
 
 
