@@ -17,10 +17,7 @@ steps:
     KeyVaultName: 'troyhopkeyvault'
     SecretsFilter: '*'
     RunAsPreJob: false
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: 'Write-Host "API Token:" $(xxiotcapikey)'
+
 - task: PowerShell@2
   inputs:
     filePath: 'IoTC-Task.ps1'
