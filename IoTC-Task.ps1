@@ -2,7 +2,7 @@
 [CmdletBinding()]
         Param(
           [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-          [String] $iotcapikey,
+          [String] $iotcapikey
     	)
         
 $Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
