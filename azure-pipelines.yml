@@ -17,11 +17,10 @@ steps:
     KeyVaultName: 'troyhopkeyvault'
     SecretsFilter: '*'
     RunAsPreJob: false
-
 - task: PowerShell@2
   inputs:
     filePath: 'IoTC-Task.ps1'
-    arguments: '-iotcapikey "$(iotcapikey)"'
+    arguments: '-ApiToken "$(iotcapikey)",-ConfigPath "",-AppName "Nerf"'
     pwsh: true
     
 - script: dotnet build --configuration $(buildConfiguration)
