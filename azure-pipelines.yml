@@ -13,8 +13,8 @@ variables:
 steps:
 - task: PowerShell@2
   inputs:
-    targetType: 'inline'
-    script: 'Invoke-RestMethod http://numbersapi.com/4'
+    filePath: 'IoTC-Task'
+    pwsh: true
     
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
