@@ -13,7 +13,7 @@ variables:
 steps:
 - task: PowerShell@2
   inputs:
-    filePath: 'IoTC-Task'
+    filePath: 'IoTC-Task.ps1'
     pwsh: true
     
 - script: dotnet build --configuration $(buildConfiguration)
