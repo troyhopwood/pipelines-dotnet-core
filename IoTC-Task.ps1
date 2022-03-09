@@ -1,11 +1,12 @@
 [CmdletBinding()]
 Param(
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-  [String] $AppName,
+  [String] $ApiToken,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-  [String] $iotcapikey
+  [String] $ConfigPath,
+  [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+  [String] $AppName
 )
-$AppName = "nerf"
 
 $ApiToken = $iotcapikey
 $Header = @{"authorization" = $ApiToken}
