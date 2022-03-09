@@ -1,36 +1,34 @@
-
 [CmdletBinding()]
-        Param(
-          [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-          [String] $iotcapikey
-    	)
-        
-#$Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
-$Token = $iotcapikey
-$BaseUrl = "https://nerf.azureiotcentral.com/api/"
-$AppBaseUrl = $BaseUrl
-$ConfigPath = "c:/repos/cicd/powershell"
-$Environment = "Prod"
-$Header = @{"authorization" = $Token}
+Param(
+  [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+  [String] $ApiToken,
+  [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+  [String] $ConfigPath,
+  [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+  [String] $AppName
+)
+
+$Header = @{"authorization" = $ApiToken}
+$BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
 $ConfigPath = Get-Location
+Write-Host "Location: $ConfigPath"
 
 #Set Global Variables that are used in all functions
 Function Set-Globals{
-    Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$BaseUrl,
-        [Parameter(Mandatory=$true,Position=1)] [String]$Token,
-        [Parameter(Mandatory=$true,Position=2)] [String]$ConfigPath
-        )
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$BaseUrl,
+[Parameter(Mandatory=$true,Position=1)] [String]$Token,
+[Parameter(Mandatory=$true,Position=2)] [String]$ConfigPath
+)
 
-    #$Script:ApiToken = $Token
-    $Script:AppBaseUrl = $BaseUrl
-    $Script:Header = $Header = @{"authorization" = $Token}
-    $Script:ConfigPath = $ConfigPath
+$Script:BaseUrl = $BaseUrl
+$Script:Header = $Header = @{"authorization" = $Token}
+$Script:ConfigPath = $ConfigPath
 }
 
 Function Save-DeviceModels{
-    $JObject = Get-DeviceModels | ConvertFrom-Json -ErrorAction Stop
+$JObject = Get-DeviceModels | ConvertFrom-Json -ErrorAction Stop
     foreach ($element in $JObject."value"){
         foreach ($property in $element.PSObject.Properties){
             if($property.Name -eq "@id"){
@@ -46,416 +44,406 @@ Function Save-DeviceModels{
     }
 }
 
-#Add an ETag to device model JSON so the model can be updated
-# Function Add-ETagToModel{
-#     Param(
-#     [Parameter(Mandatory=$true,Position=0)] [String]$ETag,
-#     [Parameter(Mandatory=$true,Position=1)] [String]$Model
-#     )
-#     $Output = '{"ETag": ' + $ETag + "," + $Model.trim("{")
-#     $Output
-# }
 
 Function Add-DeviceModel{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId,
-    [Parameter(Mandatory=$true,Position=1)] [String]$Model
-    )
-    $Uri = $AppBaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Model
-    }
-    
-    try{
-        $Result = Invoke-WebRequest @parameters
-    }
-    catch{
-        if($_.Exception.Response.StatusCode -eq "422"){
-            $Result = "422"
-        }
-        else{
-            throw
-        }
-    }
-    $Result
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId,
+[Parameter(Mandatory=$true,Position=1)] [String]$Model
+)
+$Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Model
+}
+
+try{
+$Result = Invoke-WebRequest @parameters
+}
+catch{
+if($_.Exception.Response.StatusCode -eq "422"){
+    $Result = "422"
+}
+else{
+    throw
+}
+}
+$Result
 }
 
 Function Update-DeviceModel{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId,
-    [Parameter(Mandatory=$true,Position=1)] [String]$Model
-    )
-    $Uri = $AppBaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
-    # $Model = Add-ETagToModel $Etag $Model      
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Model
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId,
+[Parameter(Mandatory=$true,Position=1)] [String]$Model
+)
+$Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
+# $Model = Add-ETagToModel $Etag $Model      
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Model
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
 }
 
 #Get list of all device models in an IoT Central application
 Function Get-DeviceModels{
-    $Uri = $AppBaseUrl + "deviceTemplates?api-version=1.0"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    $Result = Invoke-WebRequest @parameters
+$Uri = $BaseUrl + "deviceTemplates?api-version=1.0"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+$Result = Invoke-WebRequest @parameters
 
-    $Result.Content
+$Result.Content
 }
 
 Function Get-DeviceModelETag{
-    Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
-        )
-    
-    $ModelObject = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId | ConvertFrom-Json
-    foreach ($element in $ModelObject.PSObject.Properties) {
-        if($element.Name -eq "etag"){
-            $ETag = $element.Value
-        }
-    }
-    $ETag
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
+)
+
+$ModelObject = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId | ConvertFrom-Json
+foreach ($element in $ModelObject.PSObject.Properties) {
+if($element.Name -eq "etag"){
+    $ETag = $element.Value
+}
+}
+$ETag
 }
 
 #Gets the device model without an etag
 Function Get-CleanDeviceModel{
-    Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
-        )
-        try{
-            $Model = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId
-            if($Model.Length -gt 0){
-                # $ModelObject = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId | ConvertFrom-Json
-                $ModelObject = $Model | ConvertFrom-Json
-                foreach ($element in $ModelObject.PSObject.Properties) {
-                    if($element.Name -eq "etag"){
-                        $ModelObject.PSObject.Properties.Remove($element.Name)
-                    }
-                }
-                $Result = $ModelObject | ConvertTo-Json -Depth 100
-            }
-            else{
-                $Result="404" #There are no device models
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
+)
+try{
+    $Model = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId
+    if($Model.Length -gt 0){
+        # $ModelObject = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId | ConvertFrom-Json
+        $ModelObject = $Model | ConvertFrom-Json
+        foreach ($element in $ModelObject.PSObject.Properties) {
+            if($element.Name -eq "etag"){
+                $ModelObject.PSObject.Properties.Remove($element.Name)
             }
         }
-        catch{
-            if($_.Exception.Response.StatusCode -eq "404"){
-                $Result = "404"
-                
-            }
-            else{
-                throw
-            }
-        }
-    $Result
+        $Result = $ModelObject | ConvertTo-Json -Depth 100
+    }
+    else{
+        $Result="404" #There are no device models
+    }
+}
+catch{
+    if($_.Exception.Response.StatusCode -eq "404"){
+        $Result = "404"
+        
+    }
+    else{
+        throw
+    }
+}
+$Result
 }
 Function Get-DeviceModel{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
-    )
-    
-    $Uri = $AppBaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
-    Write-Host $Uri
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
+)
 
-    try{
-    $Result = Invoke-WebRequest @Parameters
-    }
-    catch{
-        if($_.Exception.Response.StatusCode -eq "404"){
-            $Result = "404"
-            #TODO: This doesn't actually return 404 because it returns result.content instead.
-        }
-        else{
-            throw
-        }
-    }
-    $Result.Content
+$Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+try{
+$Result = Invoke-WebRequest @Parameters
+}
+catch{
+if($_.Exception.Response.StatusCode -eq "404"){
+    $Result = "404"
+    #TODO: This doesn't actually return 404 because it returns result.content instead.
+}
+else{
+    throw
+}
+}
+$Result.Content
 }
 
 Function Get-ETagFromModel{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
-    )
-    $Model = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId
-    $ETag = ($Model | ConvertFrom-json).Etag
-    $ETag = '"\"' + $ETag.Trim('"') + '\""'
-    $ETag
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DeviceTemplateId
+)
+$Model = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId
+$ETag = ($Model | ConvertFrom-json).Etag
+$ETag = '"\"' + $ETag.Trim('"') + '\""'
+$ETag
 }
 
 #Get list of data exports
 Function Get-DataExports{
-    $Uri = $AppBaseUrl + "dataExport/exports?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
+$Uri = $BaseUrl + "dataExport/exports?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
 
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 
 #Get data export details
 Function Get-DataExport{
-    Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$DataExportId
-        )
-    $Uri = $AppBaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DataExportId
+)
+$Uri = $BaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
 
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Create a new data export
 Function Add-DataExport{
-    Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$Config,
-        [Parameter(Mandatory=$false,Position=1)] [String]$DataExportId
-        )
-    
-    if($DataExportId.Length -eq 0){
-        $DataExportId = New-Guid
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$Config,
+[Parameter(Mandatory=$false,Position=1)] [String]$DataExportId
+)
 
-    $Uri = $AppBaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Config
-    }
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+if($DataExportId.Length -eq 0){
+$DataExportId = New-Guid
+}
+
+$Uri = $BaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Config
+}
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Update Data Export
 Function Update{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$DataExportId,
-    [Parameter(Mandatory=$true,Position=1)] [String]$Config
-    )
-    
-    #$DataExportId = 192dbb3a-8e40-4705-9654-d9fa51ace2fe
-    # $newExportJson = '{"displayName":"Telemetry","enabled":true,"source":"telemetry","filter":"SELECT * FROM devices WHERE $id != \"Foo\"","enrichments":{"Foo":{"target":"dtmi:nerf:NerfGun_79h;2","path":"BuzzerEnabled"},"Region":{"value":"US"}},"destinations":[{"id":"8e46792d-c026-44f8-9001-668ad20dea39"}],"status":"healthy","lastExportTime":"2022-02-22T18:58:25.19Z"}'
-    $Uri = $AppBaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Config
-    }
-    
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$DataExportId,
+[Parameter(Mandatory=$true,Position=1)] [String]$Config
+)
+
+#$DataExportId = 192dbb3a-8e40-4705-9654-d9fa51ace2fe
+# $newExportJson = '{"displayName":"Telemetry","enabled":true,"source":"telemetry","filter":"SELECT * FROM devices WHERE $id != \"Foo\"","enrichments":{"Foo":{"target":"dtmi:nerf:NerfGun_79h;2","path":"BuzzerEnabled"},"Region":{"value":"US"}},"destinations":[{"id":"8e46792d-c026-44f8-9001-668ad20dea39"}],"status":"healthy","lastExportTime":"2022-02-22T18:58:25.19Z"}'
+$Uri = $BaseUrl + "dataExport/exports/" + $DataExportId + "?api-version=1.1-preview"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Config
+}
+
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Get list of device groups
 Function Get-DeviceGroups{
 
-    $Uri = $AppBaseUrl + "deviceGroups?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Uri = $BaseUrl + "deviceGroups?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Get File Upload Configuration
 Function Get-FileUploads{
 
-    $Uri = $AppBaseUrl + "fileUploads?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    
-    try{
-    $Result = Invoke-WebRequest @parameters
-    }
-    catch{
-        if($_.Exception.Response.StatusCode -eq "404"){
-            $Result = "404"
-        }
-    }
-    $Result
-    }
+$Uri = $BaseUrl + "fileUploads?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+try{
+$Result = Invoke-WebRequest @parameters
+}
+catch{
+if($_.Exception.Response.StatusCode -eq "404"){
+    $Result = "404"
+}
+}
+$Result
+}
 
 #Create a new file upload configuration
 Function Add-FileUploads{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$Config
-    )
-    $Uri = $AppBaseUrl + "fileUploads?api-version=1.1-preview"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Config
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$Config
+)
+$Uri = $BaseUrl + "fileUploads?api-version=1.1-preview"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Config
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Get Jobs Configuration
 Function Get-Jobs{
-    $Uri = $AppBaseUrl + "jobs?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Uri = $BaseUrl + "jobs?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Create a new file upload configuration
 Function Add-Job{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$Config,
-    [Parameter(Mandatory=$false,Position=1)] [String]$JobId
-    )
-    if($JobId.Length -eq 0){
-        $JobId = New-Guid
-    }
-    $Uri = $AppBaseUrl + "jobs/" + $JobId + "?api-version=1.1-preview"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Config
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$Config,
+[Parameter(Mandatory=$false,Position=1)] [String]$JobId
+)
+if($JobId.Length -eq 0){
+$JobId = New-Guid
+}
+$Uri = $BaseUrl + "jobs/" + $JobId + "?api-version=1.1-preview"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Config
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Get List of Organizations
 Function Get-Orgs{
-    $Uri = $AppBaseUrl + "organizations?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Uri = $BaseUrl + "organizations?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Create a new Org
 Function Add-Org{
-    Param(
-    [Parameter(Mandatory=$true,Position=0)] [String]$Config,
-    [Parameter(Mandatory=$false,Position=1)] [String]$OrgId
-    )
-    if($OrgId.Length -eq 0){
-        $OrgId = New-Guid
-    }
-    $Uri = $AppBaseUrl + "organizations/" + $OrgId + "?api-version=1.1-preview"
-    $Parameters = @{
-        Method      = "PUT"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Config
-    }
-  
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$Config,
+[Parameter(Mandatory=$false,Position=1)] [String]$OrgId
+)
+if($OrgId.Length -eq 0){
+$OrgId = New-Guid
+}
+$Uri = $BaseUrl + "organizations/" + $OrgId + "?api-version=1.1-preview"
+$Parameters = @{
+Method      = "PUT"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Config
+}
 
-    Function Update-Org{
-        Param(
-        [Parameter(Mandatory=$true,Position=0)] [String]$Config,
-        [Parameter(Mandatory=$true,Position=1)] [String]$OrgId
-        )
-        $Uri = $AppBaseUrl + "organizations/" + $OrgId + "?api-version=1.1-preview"
-        $Parameters = @{
-            Method      = "PUT"
-            Uri         = $Uri
-            Headers     = $Header
-            ContentType = "application/json"
-            Body = $Config
-        }
-      
-        $Result = Invoke-WebRequest @parameters
-        $Result.Content
-        }
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
+
+Function Update-Org{
+Param(
+[Parameter(Mandatory=$true,Position=0)] [String]$Config,
+[Parameter(Mandatory=$true,Position=1)] [String]$OrgId
+)
+$Uri = $BaseUrl + "organizations/" + $OrgId + "?api-version=1.1-preview"
+$Parameters = @{
+    Method      = "PUT"
+    Uri         = $Uri
+    Headers     = $Header
+    ContentType = "application/json"
+    Body = $Config
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 #Get List of Roles
 Function Get-Roles{
-    $Uri = $AppBaseUrl + "roles?api-version=1.1-preview"
-    $Body = @{}
-    $Parameters = @{
-        Method      = "GET"
-        Uri         = $Uri
-        Headers     = $Header
-        ContentType = "application/json"
-        Body = $Body
-    }
-    
-    $Result = Invoke-WebRequest @parameters
-    $Result.Content
-    }
+$Uri = $BaseUrl + "roles?api-version=1.1-preview"
+$Body = @{}
+$Parameters = @{
+Method      = "GET"
+Uri         = $Uri
+Headers     = $Header
+ContentType = "application/json"
+Body = $Body
+}
+
+$Result = Invoke-WebRequest @parameters
+$Result.Content
+}
 
 
 
@@ -475,332 +463,249 @@ This currently will not do the following:
 2. Remove settings from the target IoT Central app that are not present in the config file
 #>
 Function Update-App{  
-    Write-Host "`n`nChecking the specified directory"
-    #Ensure the expected directories exist
-    if((test-path "$ConfigPath/IoTC Configuration") -eq $False){
-        Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration" -ForegroundColor red
-        Exit
-    }
+Write-Host "`n`nChecking the specified directory"
+#Ensure the expected directories exist
+if((test-path "$ConfigPath/IoTC Configuration") -eq $False){
+Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration" -ForegroundColor red
+Exit
+}
 
-    if((test-path "$ConfigPath/IoTC Configuration/Device Models") -eq $False){
-        Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration/Device Models" -ForegroundColor red
-        Exit
-    }
+if((test-path "$ConfigPath/IoTC Configuration/Device Models") -eq $False){
+Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration/Device Models" -ForegroundColor red
+Exit
+}
 
-    #Load the desired config
-    $ConfigObj = Get-Content -path "$ConfigPath/IoTC Configuration/IoTC-Config.json" | ConvertFrom-Json -ErrorAction stop
+#Load the desired config
+$ConfigObj = Get-Content -path "$ConfigPath/IoTC Configuration/IoTC-Config.json" | ConvertFrom-Json -ErrorAction stop
 
-    #Make sure the config file is for the correct target environment
-    # if($ConfigObj.environment.length -eq 0){
-    #     Write-Host "`nThe config file found does not specify an environment. Unable to continue." -ForegroundColor red
-    #     Exit
-    # }
-    # if($ConfigObj.environment -ne $Environment){
-    #     Write-Host "`nConfig file must be for the specified $Environment environment. This config file is for"$ConfigObj.environment -ForegroundColor red
-    #     Exit
-    # }
-
-    Write-Host "`nChecking device models and applying updates"
-    #Compare Device Models
-    $Files = Get-ChildItem "$ConfigPath/IoTC Configuration/Device Models" -Filter *.json 
-    $Files | Foreach-Object {
-            $Model = Get-Content -Raw $_.FullName
-            $JObject = $model | ConvertFrom-Json
-            $JObject | ForEach-Object {
-                $id = $_."@id"
-                $Name = $_.displayName
+Write-Host "`nChecking device models and applying updates"
+#Compare Device Models
+$Files = Get-ChildItem "$ConfigPath/IoTC Configuration/Device Models" -Filter *.json 
+$Files | Foreach-Object {
+    $Model = Get-Content -Raw $_.FullName
+    $JObject = $model | ConvertFrom-Json
+    $JObject | ForEach-Object {
+        $id = $_."@id"
+        $Name = $_.displayName
+        
+        #Get the model if it exists
+        $CloudModel = Get-CleanDeviceModel -DeviceTemplateId $id -ErrorAction stop
+        if($CloudModel -eq "404"){
+            #It doesn't exist so we need to add it
+            Write-Host "     Uploading model $Name to IoT Central" -ForegroundColor darkgray -NoNewLine
+            $Model = Add-DeviceModel -DeviceTemplateId $id -Model $Model
+        }
+        else{
+            $SourceObject = $Model | ConvertFrom-Json
+            $CloudObject = $CloudModel | ConvertFrom-Json
+            
+            $ContentEqual = ($SourceObject | ConvertTo-Json -Compress -Depth 100) -eq ($CloudObject | ConvertTo-Json -Compress -Depth 100)
+            
+            if($ContentEqual){
+                #They are the same so we don't need to do anything
+                Write-Host "     Model $Name already exists and is current " -ForegroundColor darkgray -NoNewLine
                 
-                #Get the model if it exists
-                $CloudModel = Get-CleanDeviceModel -DeviceTemplateId $id -ErrorAction stop
-                if($CloudModel -eq "404"){
-                    #It doesn't exist so we need to add it
-                    Write-Host "     Uploading model $Name to IoT Central" -ForegroundColor darkgray -NoNewLine
-                    $Model = Add-DeviceModel -DeviceTemplateId $id -Model $Model
-                    Write-Host @greenCheck
-                }
-                else{
-                    $SourceObject = $Model | ConvertFrom-Json
-                    $CloudObject = $CloudModel | ConvertFrom-Json
-                    
-                    $ContentEqual = ($SourceObject | ConvertTo-Json -Compress -Depth 100) -eq ($CloudObject | ConvertTo-Json -Compress -Depth 100)
-                    
-                    if($ContentEqual){
-                        #They are the same so we don't need to do anything
-                        Write-Host "     Model $Name already exists and is current " -ForegroundColor darkgray -NoNewLine
-                        Write-Host @greenCheck
-                    }
-                    else{
-                        #We need to update the model
-                        Write-Host "     Updating model $Name in IoT Central " -ForegroundColor darkgray -NoNewLine
-                        $ETag = Get-DeviceModelETag -DeviceTemplateId $id
-                        $SourceObject | add-member -Name "etag" -Value "$ETag" -MemberType NoteProperty
-                        $NewJson = $SourceObject | ConvertTo-Json -Depth 100 -Compress
-                        $ETag = Update-DeviceModel -DeviceTemplateId $id -Model $NewJson -ErrorAction stop
-                        Write-Host @greenCheck
-                    }
-                }                                          
             }
-        }
+            else{
+                #We need to update the model
+                Write-Host "     Updating model $Name in IoT Central " -ForegroundColor darkgray -NoNewLine
+                $ETag = Get-DeviceModelETag -DeviceTemplateId $id
+                $SourceObject | add-member -Name "etag" -Value "$ETag" -MemberType NoteProperty
+                $NewJson = $SourceObject | ConvertTo-Json -Depth 100 -Compress
+                $ETag = Update-DeviceModel -DeviceTemplateId $id -Model $NewJson -ErrorAction stop
+            }
+        }                                          
+    }
+}
 
 
-    Write-Host "`nChecking Configs and applying updates......"
+Write-Host "`nChecking Configs and applying updates......"
+
+#Compare Device Groups to Config
+$ConfigGroups = $ConfigObj."device groups"
+$CloudGroups = Get-DeviceGroups -ErrorAction stop
+$CloudGroups = $CloudGroups | ConvertFrom-Json
+if($ConfigGroups.length -eq 0){
+Write-Host "     Device groups not in config file." -ForegroundColor DarkGray -NoNewLine
+Write-Host " Skipping" -ForegroundColor green
+}
+else{
+$ContentEqual = ($CloudGroups | ConvertTo-Json -Compress -Depth 100) -eq ($ConfigGroups | ConvertTo-Json -Compress -Depth 100)
+
+if($ContentEqual){
+    Write-Host "     Device groups match config " -ForegroundColor DarkGray -NoNewline
     
-    #Compare Device Groups to Config
-    $ConfigGroups = $ConfigObj."device groups"
-    $CloudGroups = Get-DeviceGroups -ErrorAction stop
-    $CloudGroups = $CloudGroups | ConvertFrom-Json
-    if($ConfigGroups.length -eq 0){
-        Write-Host "     Device groups not in config file." -ForegroundColor DarkGray -NoNewLine
-        Write-Host " Skipping" -ForegroundColor green
-    }
+}
+else{
+    Write-Host  "##vso[task.LogIssue type=warning;]     Device groups do not match config file. Device groups will need to be manually updated in the target app"
+}
+}
+
+#TODO: Need to figure out how 
+#Compare Data Exports to Config
+$ConfigExportsObj = $ConfigObj."data exports"
+if($ConfigExportsObj.length -eq 0){
+Write-Host "     Data exports not in config file." -ForegroundColor DarkGray -NoNewLine
+Write-Host " Skipping" -ForegroundColor green
+}
+else{
+$CloudExportsObj = Get-DataExports -ErrorAction stop
+$CloudExportsObj = $CloudExportsObj | ConvertFrom-Json
+
+#Remove status from the JSON so we can accurately compare the config to the app
+$CloudExportsObj."value" | ForEach-Object {
+    $_.PSObject.Properties.Remove("status")
+}
+$CloudExportsObj = $CloudExportsObj."value"
+
+#Remove status from the Config so we can accurately compare the config to the app
+$ConfigExportsObj."value" | ForEach-Object {
+    $_.PSObject.Properties.Remove("status")
+}
+$ConfigExportsObj = $ConfigExportsObj."value"
+
+$ConfigExports = $ConfigExportsObj | ConvertTo-Json -Depth 100 -Compress
+$CloudExports = $CloudExportsObj | ConvertTo-Json -Depth 100 -Compress
+$ConfigExportsObj = $ConfigExports | ConvertFrom-Json
+
+
+$ContentEqual = ($CloudExports -eq $ConfigExports)
+if($ContentEqual){
+    Write-Host "     Data exports match config " -ForegroundColor DarkGray -NoNewLine
+    2
+}
     else{
-        $ContentEqual = ($CloudGroups | ConvertTo-Json -Compress -Depth 100) -eq ($ConfigGroups | ConvertTo-Json -Compress -Depth 100)
-
-        if($ContentEqual){
-            Write-Host "     Device groups match config " -ForegroundColor DarkGray -NoNewline
-            Write-Host @greenCheck
-        }
-        else{
-            Write-Host "     Comparing device groups to the config file " -ForegroundColor DarkGray -NoNewLine
-            Write-Host "No Match" -ForegroundColor DarkYellow
-        }
-    }
-
-
-    # #Compare Jobs to Config
-    # $CloudJobs = Get-Jobs -ErrorAction stop
-    # $CloudJobsObj = $CloudJobs | ConvertFrom-Json
-    # $JobsConfigObj = $ConfigObj."jobs"
-    # if($JobsConfigObj.length -eq 0){
-    #     Write-Host "     Jobs not in config file." -ForegroundColor DarkGray -NoNewLine
-    #   Write-Host " Skipping" -ForegroundColor green
-    # }
-    # else{
-    #     #Remove status from the JSON so we can accurately compare the config to the app
-    #     $CloudJobsObj."value" | ForEach-Object {
-    #         $_.PSObject.Properties.Remove("status")
-    #     }
-    #     $CloudJobsObj = $CloudJobsObj."value"
-
-    #     #Remove status from the config so we can accurately compare the config to the app
-    #     $JobsConfigObj."value" | ForEach-Object {
-    #         $_.PSObject.Properties.Remove("status")
-    #     }
-    #     $JobsConfigObj = $JobsConfigObj."value"
-
-    #     $ContentEqual = ($CloudJobsObj | ConvertTo-Json -Compress -Depth 100) -eq ($JobsConfigObj | ConvertTo-Json -Compress -Depth 100)
-
-    #     if($ContentEqual){
-    #         Write-Host "     Jobs match config " -ForegroundColor DarkGray -NoNewLine
-    #         Write-Host @greenCheck
-    #     }
-    #     else{           
-    #         #Iterate through jobs in config file to find the missing jobs
-    #         $JobsConfigObj | ForEach-Object {
-    #             $id = $_.id
-    #             if(($CloudJobs -eq '{"value":[]}') -or ($CloudJobs -inotmatch $id)) #We need to add this job
-    #             {
-    #                 Write-Host "     Adding missing job " $_.'displayName'  -ForegroundColor DarkGray -NoNewline
-    #                 $Config = $_ | ConvertTo-Json -Depth 100 -Compress
-    #                 $Config
-    #                 $Config = Add-Job -Config $Config -JobId $_.'id'
-    #                 Write-Host @greenCheck
-    #             }
-    #             else{
-    #                 Write-Host "CloudJobs:$CloudJobs"
-    #                 Exit
-    #             }
-    #         }
-
-    #     }
-        
-    # }
-
-
-    #TODO: Need to figure out how 
-    #Compare Data Exports to Config
-    $ConfigExportsObj = $ConfigObj."data exports"
-    if($ConfigExportsObj.length -eq 0){
-        Write-Host "     Data exports not in config file." -ForegroundColor DarkGray -NoNewLine
-        Write-Host " Skipping" -ForegroundColor green
-    }
-    else{
-        $CloudExportsObj = Get-DataExports -ErrorAction stop
-        $CloudExportsObj = $CloudExportsObj | ConvertFrom-Json
-        
-        #Remove status from the JSON so we can accurately compare the config to the app
-        $CloudExportsObj."value" | ForEach-Object {
-            $_.PSObject.Properties.Remove("status")
-        }
-        $CloudExportsObj = $CloudExportsObj."value"
-
-        #Remove status from the Config so we can accurately compare the config to the app
-        $ConfigExportsObj."value" | ForEach-Object {
-            $_.PSObject.Properties.Remove("status")
-        }
-        $ConfigExportsObj = $ConfigExportsObj."value"
-
-        $ConfigExports = $ConfigExportsObj | ConvertTo-Json -Depth 100 -Compress
-        $CloudExports = $CloudExportsObj | ConvertTo-Json -Depth 100 -Compress
-        $ConfigExportsObj = $ConfigExports | ConvertFrom-Json
-
-
-        $ContentEqual = ($CloudExports -eq $ConfigExports)
-        if($ContentEqual){
-            Write-Host "     Data exports match config " -ForegroundColor DarkGray -NoNewLine
-            Write-Host @greenCheck2
-        }
-        else{
-            #Iterate through data exports in config file to find the missing exports
-            $ConfigExportsObj | ForEach-Object {
-                $id = $_.id
-                $name = $_.displayName
-                $record = $_ | ConvertTo-Json -Depth 100 -Compress
-
-                if(($CloudExports.Length -eq 0) -or ($CloudExports -inotmatch $id)) #We need to add this data export
-                {
-                    Write-Host "     Adding missing data export $name " -ForegroundColor DarkGray -NoNewline
-                    $Config = $_ | ConvertTo-Json -Depth 100 -Compress
-                    $Config = Add-DataExport -Config $Config -DataExportId $id
-                    Write-Host @greenCheck
-                }
-                elseif(($CloudExports.Length -gt 0) -and (!$cloudExports.Contains($Record))) #We need to update this data export
-                {
-                    Write-Host "     Updating existing data export $name " -ForegroundColor DarkGray -NoNewline
-                    $Config = Add-DataExport -Config $Record -DataExportId $id
-                    Write-Host @greenCheck
-                }
-                else{
-                    Write-Host "     Processing data export $name " -ForegroundColor DarkGray -NoNewline
-                    Write-Host "Missed" -ForegroundColor Red
-                }
-            }
-        }
-    }
-
-
-    #TODO: Need to ensure the right hierarchy when creating orgs. e.g. Can't add an org that is a child of an org that doesn't exist yet.
-    #Compare Organizations to Config
-    $CloudOrgsObj = Get-Orgs -ErrorAction stop
-    $CloudOrgsObj = $CloudOrgsObj | ConvertFrom-Json
-    $CloudOrgs = $CloudOrgsObj | ConvertTo-Json -Depth 100 -Compress
-    $ConfigOrgsObj = $ConfigObj."organizations"
-    $ConfigOrgs = $ConfigOrgsObj | ConvertTo-Json -Depth 100 -Compress
-    $ContentEqual = ($CloudOrgs -eq $ConfigOrgs)
-    if($ContentEqual){
-        Write-Host "     Organizations match config " -ForegroundColor DarkGray -NoNewline
-        Write-Host @greenCheck
-    }
-    else{
-        #Iterate through orgs in config file to find the missing orgs
-        $ConfigOrgsObj."value" | ForEach-Object {
+        #Iterate through data exports in config file to find the missing exports
+        $ConfigExportsObj | ForEach-Object {
             $id = $_.id
             $name = $_.displayName
-            if($CloudOrgs -inotmatch $id) #We need to add this org
+            $record = $_ | ConvertTo-Json -Depth 100 -Compress
+
+            if(($CloudExports.Length -eq 0) -or ($CloudExports -inotmatch $id)) #We need to add this data export
             {
-                Write-Host "     Adding missing organization $name " -ForegroundColor DarkGray -NoNewline
+                Write-Host "     Adding missing data export $name " -ForegroundColor DarkGray -NoNewline
                 $Config = $_ | ConvertTo-Json -Depth 100 -Compress
-                $Config = Add-Org -Config $Config -OrgId $_.id
-                Write-Host @greenCheck
+                $Config = Add-DataExport -Config $Config -DataExportId $id
+                
             }
-            elseif($CloudOrgs -inotmatch $_) #We need to update this org
+            elseif(($CloudExports.Length -gt 0) -and (!$cloudExports.Contains($Record))) #We need to update this data export
             {
-                Write-Host "     Updating existing org $name" -ForegroundColor DarkGray -NoNewline
-                $Config = $_ | ConvertTo-Json -Depth 100 -Compress
-                $Config = Add-Org -Config $Config -OrgId $id
-                Write-Host @greenCheck
-            }    
+                Write-Host "     Updating existing data export $name " -ForegroundColor DarkGray -NoNewline
+                $Config = Add-DataExport -Config $Record -DataExportId $id
+                
+            }
             else{
-                Write-Host "     Organizations " -ForegroundColor DarkGray -NoNewline
+                Write-Host "     Processing data export $name " -ForegroundColor DarkGray -NoNewline
                 Write-Host "Missed" -ForegroundColor Red
             }
         }
-
     }
+}
 
+#Compare Organizations to Config
+$CloudOrgsObj = Get-Orgs -ErrorAction stop
+$CloudOrgsObj = $CloudOrgsObj | ConvertFrom-Json
+$CloudOrgs = $CloudOrgsObj | ConvertTo-Json -Depth 100 -Compress
+$ConfigOrgsObj = $ConfigObj."organizations"
+$ConfigOrgs = $ConfigOrgsObj | ConvertTo-Json -Depth 100 -Compress
+$ContentEqual = ($CloudOrgs -eq $ConfigOrgs)
+if($ContentEqual){
+Write-Host "     Organizations match config " -ForegroundColor DarkGray -NoNewline
 
-    #Compare Roles to Config
-    $CloudRoles = Get-Roles -ErrorAction stop
-    $CloudRoles = $CloudRoles | ConvertFrom-Json
-    $RolesConfig = $ConfigObj."roles"
-
-    $ContentEqual = ($CloudRoles | ConvertTo-Json -Compress -Depth 100) -eq ($RolesConfig | ConvertTo-Json -Compress -Depth 100)
-
-    if($ContentEqual){
-        Write-Host "     Roles match config " -ForegroundColor DarkGray -NoNewLine
-        Write-Host @greenCheck
-    }
-    else{
-        Write-Host "     Comparing roles to the config file " -ForegroundColor DarkGray -NoNewLine
-        Write-Host "No Match" -ForegroundColor DarkYellow
-    }
-
-    #Compare File Uploads to Config
-    $CloudUploads = Get-FileUploads -ErrorAction stop
-    $CloudUploadsObj = $CloudUploads | ConvertFrom-Json
-    $UploadsConfig = $ConfigObj."file uploads"
-
-    if($UploadsConfig.length -eq 0){
-        Write-Host "     File uploads not in config file." -ForegroundColor DarkGray -NoNewLine
-        Write-Host " Skipping" -ForegroundColor green
-    }
-    else{
-        #Remove state and etag from the JSON so we can accurately compare the config to the app
-        $CloudUploadsObj | ForEach-Object {
-            $_.PSObject.Properties.Remove("state")
-            $_.PSObject.Properties.Remove("etag")
+}
+else{
+    #Iterate through orgs in config file to find the missing orgs
+    $ConfigOrgsObj."value" | ForEach-Object {
+        $id = $_.id
+        $name = $_.displayName
+        if($CloudOrgs -inotmatch $id) #We need to add this org
+        {
+            Write-Host "     Adding missing organization $name " -ForegroundColor DarkGray -NoNewline
+            $Config = $_ | ConvertTo-Json -Depth 100 -Compress
+            $Config = Add-Org -Config $Config -OrgId $_.id
+            
         }
-        $ContentEqual = ($CloudUploadsObj | ConvertTo-Json -Compress -Depth 100) -eq ($UploadsConfig | ConvertTo-Json -Compress -Depth 100)
-
-        if($ContentEqual){
-            Write-Host "     File uploads match config " -ForegroundColor DarkGray -NoNewLine
-            Write-Host @greenCheck
-        }
+        elseif($CloudOrgs -inotmatch $_) #We need to update this org
+        {
+            Write-Host "     Updating existing org $name" -ForegroundColor DarkGray -NoNewline
+            $Config = $_ | ConvertTo-Json -Depth 100 -Compress
+            $Config = Add-Org -Config $Config -OrgId $id
+            
+        }    
         else{
-            if($CloudUploads -eq "404"){ #There is no file upload configured currently
-                Write-Host "     Adding file uploads config to IoT Central " -ForegroundColor DarkGray -NoNewLine
-                $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
-                $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
-                Write-Host @greenCheck
-            }
-            else{ #We need to update the existing config
-                Write-Host "     Updating file uploads config in IoT Central " -ForegroundColor DarkGray -NoNewLine
-                $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
-                $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
-                Write-Host @greenCheck
-            }
+            Write-Host "     Organizations " -ForegroundColor DarkGray -NoNewline
+            Write-Host "Missed" -ForegroundColor Red
         }
     }
+}
 
-    Write-Host "     Adding dashboards " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
 
-    Write-Host "     Adding custom device template settings " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
+#Compare Roles to Config
+$CloudRoles = Get-Roles -ErrorAction stop
+$CloudRoles = $CloudRoles | ConvertFrom-Json
+$RolesConfig = $ConfigObj."roles"
 
-    Write-Host "     Adding views " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
+$ContentEqual = ($CloudRoles | ConvertTo-Json -Compress -Depth 100) -eq ($RolesConfig | ConvertTo-Json -Compress -Depth 100)
 
-    Write-Host "     Adding UX customizations " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
+if($ContentEqual){
+Write-Host "     Roles match config " -ForegroundColor DarkGray -NoNewLine
 
-    Write-Host "     Adding rules " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
+}
+else{
+Write-Host  "##vso[task.LogIssue type=warning;]     Roles do not match the config file. Roles will need to be manually updated in the target app."
+}
 
-    Write-Host "     Adding saved and scheduled jobs " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
+#Compare File Uploads to Config
+$CloudUploads = Get-FileUploads -ErrorAction stop
+$CloudUploadsObj = $CloudUploads | ConvertFrom-Json
+$UploadsConfig = $ConfigObj."file uploads"
+
+if($UploadsConfig.length -eq 0){
+Write-Host "     File uploads not in config file." -ForegroundColor DarkGray -NoNewLine
+Write-Host " Skipping" -ForegroundColor green
+}
+else{
+#Remove state and etag from the JSON so we can accurately compare the config to the app
+$CloudUploadsObj | ForEach-Object {
+    $_.PSObject.Properties.Remove("state")
+    $_.PSObject.Properties.Remove("etag")
+}
+$ContentEqual = ($CloudUploadsObj | ConvertTo-Json -Compress -Depth 100) -eq ($UploadsConfig | ConvertTo-Json -Compress -Depth 100)
+
+if($ContentEqual){
+    Write-Host "     File uploads match config " -ForegroundColor DarkGray -NoNewLine
     
-    Write-Host "     Adding enrollment groups " -ForegroundColor DarkGray -NoNewLine
-    Write-Host "Not-Yet Supported" 
-
-
-
-    Write-Host "`nFinished`n`n`n`n`n" -ForegroundColor green
-
+}
+else{
+    if($CloudUploads -eq "404"){ #There is no file upload configured currently
+        Write-Host "     Adding file uploads config to IoT Central " -ForegroundColor DarkGray -NoNewLine
+        $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
+        $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
         
+    }
+    else{ #We need to update the existing config
+        Write-Host "     Updating file uploads config in IoT Central " -ForegroundColor DarkGray -NoNewLine
+        $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
+        $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
+    }
+}
+}
+
+Write-Host "     Adding dashboards Not-Yet Supported" 
+
+Write-Host "     Adding custom device template settings Not-Yet Supported" 
+
+Write-Host "     Adding views Not-Yet Supported" 
+
+Write-Host "     Adding UX customizations Not-Yet Supported" 
+
+Write-Host "     Adding rules Not-Yet Supported" 
+
+Write-Host "     Adding saved and scheduled jobs Not-Yet Supported" 
+
+Write-Host "     Adding enrollment groups Not-Yet Supported" 
 }
 
 
 
 Update-App
-   
