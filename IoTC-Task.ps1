@@ -7,10 +7,8 @@ $Header = @{"authorization" = $Token}
 
 $ConfigPath = Get-Location
 
-Write-Host "API Token:" $env:iotcapikey
-# Using PowerShell directly:
-$Secret = (Get-AzKeyVaultSecret -VaultName "troyhopkeyvault" -Name "iotcapikey").SecretValueText
-Write-Host  "PowerShell Get-AzKeyVaultSecret: $Secret"
+Write-Host "API Token:" $(iotcapikey)
+
 
 $RequiredVersion = 7
 $MajorVersion = $PSVersionTable.PSVersion.Major
