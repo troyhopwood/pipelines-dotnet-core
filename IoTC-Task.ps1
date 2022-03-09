@@ -8,6 +8,8 @@ $Header = @{"authorization" = $Token}
 $ConfigPath = Get-Location
 
 Write-Host "API Token:" $[variables.iotcapikey]
+Write-Host "IP: ($env:IP)"
+Write-Host "Token: ($env:iotcapikey)"
 
 
 $RequiredVersion = 7
