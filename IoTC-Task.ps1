@@ -8,7 +8,6 @@ Param(
   [String] $AppName
 )
 
-$ApiToken = $iotcapikey
 $Header = @{"authorization" = $ApiToken}
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
@@ -161,6 +160,7 @@ Param(
 )
 
 $Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
+
 $Body = @{}
 $Parameters = @{
 Method      = "GET"
@@ -467,12 +467,12 @@ Function Update-App{
 Write-Host "`n`nChecking the specified directory"
 #Ensure the expected directories exist
 if((test-path "$ConfigPath/IoTC Configuration") -eq $False){
-Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration" -ForegroundColor red
+Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration"
 Exit
 }
 
 if((test-path "$ConfigPath/IoTC Configuration/Device Models") -eq $False){
-Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration/Device Models" -ForegroundColor red
+Write-Host "`nDirectory not found: $ConfigPath/IoTC Configuration/Device Models"
 Exit
 }
 
@@ -493,7 +493,7 @@ $Files | Foreach-Object {
         $CloudModel = Get-CleanDeviceModel -DeviceTemplateId $id -ErrorAction stop
         if($CloudModel -eq "404"){
             #It doesn't exist so we need to add it
-            Write-Host "     Uploading model $Name to IoT Central" -ForegroundColor darkgray -NoNewLine
+            Write-Host "     Uploading model $Name to IoT Central"
             $Model = Add-DeviceModel -DeviceTemplateId $id -Model $Model
         }
         else{
@@ -504,12 +504,12 @@ $Files | Foreach-Object {
             
             if($ContentEqual){
                 #They are the same so we don't need to do anything
-                Write-Host "     Model $Name already exists and is current " -ForegroundColor darkgray -NoNewLine
+                Write-Host "     Model $Name already exists and is current "
                 
             }
             else{
                 #We need to update the model
-                Write-Host "     Updating model $Name in IoT Central " -ForegroundColor darkgray -NoNewLine
+                Write-Host "     Updating model $Name in IoT Central "
                 $ETag = Get-DeviceModelETag -DeviceTemplateId $id
                 $SourceObject | add-member -Name "etag" -Value "$ETag" -MemberType NoteProperty
                 $NewJson = $SourceObject | ConvertTo-Json -Depth 100 -Compress
@@ -527,14 +527,14 @@ $ConfigGroups = $ConfigObj."device groups"
 $CloudGroups = Get-DeviceGroups -ErrorAction stop
 $CloudGroups = $CloudGroups | ConvertFrom-Json
 if($ConfigGroups.length -eq 0){
-Write-Host "     Device groups not in config file." -ForegroundColor DarkGray -NoNewLine
-Write-Host " Skipping" -ForegroundColor green
+Write-Host "     Device groups not in config file."
+Write-Host " Skipping"
 }
 else{
 $ContentEqual = ($CloudGroups | ConvertTo-Json -Compress -Depth 100) -eq ($ConfigGroups | ConvertTo-Json -Compress -Depth 100)
 
 if($ContentEqual){
-    Write-Host "     Device groups match config " -ForegroundColor DarkGray -NoNewline
+    Write-Host "     Device groups match config "
     
 }
 else{
@@ -546,8 +546,8 @@ else{
 #Compare Data Exports to Config
 $ConfigExportsObj = $ConfigObj."data exports"
 if($ConfigExportsObj.length -eq 0){
-Write-Host "     Data exports not in config file." -ForegroundColor DarkGray -NoNewLine
-Write-Host " Skipping" -ForegroundColor green
+Write-Host "     Data exports not in config file."
+Write-Host " Skipping"
 }
 else{
 $CloudExportsObj = Get-DataExports -ErrorAction stop
@@ -572,7 +572,7 @@ $ConfigExportsObj = $ConfigExports | ConvertFrom-Json
 
 $ContentEqual = ($CloudExports -eq $ConfigExports)
 if($ContentEqual){
-    Write-Host "     Data exports match config " -ForegroundColor DarkGray -NoNewLine
+    Write-Host "     Data exports match config "
     2
 }
     else{
@@ -584,20 +584,20 @@ if($ContentEqual){
 
             if(($CloudExports.Length -eq 0) -or ($CloudExports -inotmatch $id)) #We need to add this data export
             {
-                Write-Host "     Adding missing data export $name " -ForegroundColor DarkGray -NoNewline
+                Write-Host "     Adding missing data export $name "
                 $Config = $_ | ConvertTo-Json -Depth 100 -Compress
                 $Config = Add-DataExport -Config $Config -DataExportId $id
                 
             }
             elseif(($CloudExports.Length -gt 0) -and (!$cloudExports.Contains($Record))) #We need to update this data export
             {
-                Write-Host "     Updating existing data export $name " -ForegroundColor DarkGray -NoNewline
+                Write-Host "     Updating existing data export $name "
                 $Config = Add-DataExport -Config $Record -DataExportId $id
                 
             }
             else{
-                Write-Host "     Processing data export $name " -ForegroundColor DarkGray -NoNewline
-                Write-Host "Missed" -ForegroundColor Red
+                Write-Host "     Processing data export $name "
+                Write-Host "Missed"
             }
         }
     }
@@ -611,7 +611,7 @@ $ConfigOrgsObj = $ConfigObj."organizations"
 $ConfigOrgs = $ConfigOrgsObj | ConvertTo-Json -Depth 100 -Compress
 $ContentEqual = ($CloudOrgs -eq $ConfigOrgs)
 if($ContentEqual){
-Write-Host "     Organizations match config " -ForegroundColor DarkGray -NoNewline
+Write-Host "     Organizations match config "
 
 }
 else{
@@ -621,22 +621,18 @@ else{
         $name = $_.displayName
         if($CloudOrgs -inotmatch $id) #We need to add this org
         {
-            Write-Host "     Adding missing organization $name " -ForegroundColor DarkGray -NoNewline
+            Write-Host "     Adding missing organization $name "
             $Config = $_ | ConvertTo-Json -Depth 100 -Compress
             $Config = Add-Org -Config $Config -OrgId $_.id
             
         }
         elseif($CloudOrgs -inotmatch $_) #We need to update this org
         {
-            Write-Host "     Updating existing org $name" -ForegroundColor DarkGray -NoNewline
+            Write-Host "     Updating existing org $name"
             $Config = $_ | ConvertTo-Json -Depth 100 -Compress
             $Config = Add-Org -Config $Config -OrgId $id
             
         }    
-        else{
-            Write-Host "     Organizations " -ForegroundColor DarkGray -NoNewline
-            Write-Host "Missed" -ForegroundColor Red
-        }
     }
 }
 
@@ -649,7 +645,7 @@ $RolesConfig = $ConfigObj."roles"
 $ContentEqual = ($CloudRoles | ConvertTo-Json -Compress -Depth 100) -eq ($RolesConfig | ConvertTo-Json -Compress -Depth 100)
 
 if($ContentEqual){
-Write-Host "     Roles match config " -ForegroundColor DarkGray -NoNewLine
+Write-Host "     Roles match config "
 
 }
 else{
@@ -662,8 +658,8 @@ $CloudUploadsObj = $CloudUploads | ConvertFrom-Json
 $UploadsConfig = $ConfigObj."file uploads"
 
 if($UploadsConfig.length -eq 0){
-Write-Host "     File uploads not in config file." -ForegroundColor DarkGray -NoNewLine
-Write-Host " Skipping" -ForegroundColor green
+Write-Host "     File uploads not in config file."
+Write-Host " Skipping"
 }
 else{
 #Remove state and etag from the JSON so we can accurately compare the config to the app
@@ -674,18 +670,18 @@ $CloudUploadsObj | ForEach-Object {
 $ContentEqual = ($CloudUploadsObj | ConvertTo-Json -Compress -Depth 100) -eq ($UploadsConfig | ConvertTo-Json -Compress -Depth 100)
 
 if($ContentEqual){
-    Write-Host "     File uploads match config " -ForegroundColor DarkGray -NoNewLine
+    Write-Host "     File uploads match config "
     
 }
 else{
     if($CloudUploads -eq "404"){ #There is no file upload configured currently
-        Write-Host "     Adding file uploads config to IoT Central " -ForegroundColor DarkGray -NoNewLine
+        Write-Host "     Adding file uploads config to IoT Central "
         $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
         $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
         
     }
     else{ #We need to update the existing config
-        Write-Host "     Updating file uploads config in IoT Central " -ForegroundColor DarkGray -NoNewLine
+        Write-Host "     Updating file uploads config in IoT Central "
         $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
         $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
     }
