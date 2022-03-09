@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param(
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-  [String] $ApiToken,
+  [SecureString] $ApiToken,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
   [String] $ConfigPath,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
