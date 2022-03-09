@@ -11,6 +11,16 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- task: AzureKeyVault@2
+  inputs:
+    azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
+    KeyVaultName: 'cicd-nerf'
+    SecretsFilter: '*'
+    RunAsPreJob: false
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: 'Write-Host "API Token:" $iotcapikey'
 - task: PowerShell@2
   inputs:
     filePath: 'IoTC-Task.ps1'
