@@ -1,6 +1,8 @@
 [CmdletBinding()]
 Param(
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+  [String] $AppName,
+  [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
   [String] $iotcapikey
 )
 $AppName = "nerf"
