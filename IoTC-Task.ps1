@@ -1,3 +1,10 @@
+
+[CmdletBinding()]
+        Param(
+          [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
+          [String] $iotcapikey,
+    	)
+        
 $Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
 $BaseUrl = "https://nerf.azureiotcentral.com/api/"
 $AppBaseUrl = $BaseUrl
@@ -7,9 +14,7 @@ $Header = @{"authorization" = $Token}
 
 $ConfigPath = Get-Location
 
-Write-Host "API Token:" $[variables.iotcapikey]
-Write-Host "IP: ($env:IP)"
-Write-Host "Token: ($env:iotcapikey)"
+Write-Host "API Token:" $iotcapikey
 
 
 $RequiredVersion = 7
