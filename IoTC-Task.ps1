@@ -809,27 +809,6 @@ Function Update-App{
 }
 
 
-#Display the Menu
-do
- {
-    Write-Host "============================= Options =============================" -ForegroundColor cyan
-    Write-Host "1: Generate a config file from an existing IoT Central application." -ForegroundColor cyan
-    Write-Host "2: Apply a config file to an existing IoT Central application." -ForegroundColor cyan
-    Write-Host "Q: Press 'Q' to quit." -ForegroundColor cyan
-    try{
-    $selection = Read-Host "Options" -ErrorAction Stop
-    }
-    catch{
-        Exit
-    }
-    switch ($selection)
-    {
-    '1' {
-    Build-Config
-    } '2' {
-    Update-App
-    } 
-    }
-    
- }
- until ($selection -eq 'q')
+
+Update-App
+   
