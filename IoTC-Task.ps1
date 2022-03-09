@@ -7,7 +7,7 @@ $Header = @{"authorization" = $Token}
 
 $ConfigPath = Get-Location
 
-
+Write-Host "API Token:" $(iotcapikey)
 
 $RequiredVersion = 7
 $MajorVersion = $PSVersionTable.PSVersion.Major
