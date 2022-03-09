@@ -1,7 +1,9 @@
-$Token = "SharedAccessSignature sr=f4d21a12-aa05-489d-be3d-67509437c661&sig=eVcoJse4KYLjYMV3ty5z3kTe4%2FewqpHMvMcR4fBV4ww%3D&skn=CICD&se=1677716094084"
-$BaseUrl = "https://blank-app.azureiotcentral.com/api/"
+$Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
+$BaseUrl = "https://nerf.azureiotcentral.com/api/"
+$AppBaseUrl = $BaseUrl
 $ConfigPath = "c:/repos/cicd/powershell"
 $Environment = "Prod"
+$Header = @{"authorization" = $Token}
 
 $ConfigPath = Get-Location
 
@@ -180,6 +182,7 @@ Function Get-DeviceModel{
     )
     
     $Uri = $AppBaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
+    Write-Host $Uri
     $Body = @{}
     $Parameters = @{
         Method      = "GET"
@@ -650,10 +653,7 @@ Function Update-App{
 
         $ConfigExports = $ConfigExportsObj | ConvertTo-Json -Depth 100 -Compress
         $CloudExports = $CloudExportsObj | ConvertTo-Json -Depth 100 -Compress
-
-        #Figure this out!!!!
-        $ConfigExports = $ConfigExports.Replace('8e46792d-c026-44f8-9001-668ad20dea39','e7e40404-aff4-46ef-8ee7-04d50fc94f1b') #TODO: Fix as this is Hardcoded for demo
-        $ConfigExportsObj = ConfigExports | ConvertFrom-Json
+        $ConfigExportsObj = $ConfigExports | ConvertFrom-Json
 
 
         $ContentEqual = ($CloudExports -eq $ConfigExports)
