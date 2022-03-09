@@ -5,7 +5,8 @@
           [String] $iotcapikey
     	)
         
-$Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
+#$Token = "SharedAccessSignature sr=c21140ec-719d-4fe8-aa34-381144127302&sig=DQAhrDB3x7fraIQdr%2FeMx5RnwpPZinrju9cUuC4xIIc%3D&skn=troy&se=1676505543460"
+$Token = $iotcapikey
 $BaseUrl = "https://nerf.azureiotcentral.com/api/"
 $AppBaseUrl = $BaseUrl
 $ConfigPath = "c:/repos/cicd/powershell"
@@ -13,26 +14,6 @@ $Environment = "Prod"
 $Header = @{"authorization" = $Token}
 
 $ConfigPath = Get-Location
-
-Write-Host "API Token:" $iotcapikey
-
-
-$RequiredVersion = 7
-$MajorVersion = $PSVersionTable.PSVersion.Major
-If($MajorVersion  -lt $RequiredVersion){
-    Write-Host "IoTC Config requires Powershell Core version $RequiredVersion or greater. You can get the latest release for Windows, Mac, and Linux here: https://github.com/PowerShell/PowerShell/releases/" -ForegroundColor red
-    Exit
-}
-
-Write-Host "Agent Name: $Env:AGENT_NAME."
-Write-Host "Agent ID: $Env:AGENT_ID."
-Write-Host "AGENT_WORKFOLDER contents:"
-Get-ChildItem $Env:AGENT_WORKFOLDER
-Write-Host "AGENT_BUILDDIRECTORY contents:"
-Get-ChildItem $Env:AGENT_BUILDDIRECTORY
-Write-Host "BUILD_SOURCESDIRECTORY contents:"
-Get-ChildItem $Env:BUILD_SOURCESDIRECTORY
-
 
 #Set Global Variables that are used in all functions
 Function Set-Globals{
