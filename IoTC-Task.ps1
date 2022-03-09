@@ -3,6 +3,9 @@ $BaseUrl = "https://blank-app.azureiotcentral.com/api/"
 $ConfigPath = "c:/repos/cicd/powershell"
 $Environment = "Prod"
 
+$ConfigPath = Get-Location
+
+
 
 $RequiredVersion = 7
 $MajorVersion = $PSVersionTable.PSVersion.Major
