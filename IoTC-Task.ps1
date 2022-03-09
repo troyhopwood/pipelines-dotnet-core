@@ -24,7 +24,7 @@ Get-ChildItem $Env:BUILD_SOURCESDIRECTORY
 
 
 $location = Get-Location
-Import-Module -Name $location\IoTCentral\IoTCentral.psd1 -Force
+Import-Module -Name $location\IoTCentral.psd1 -Force
 
 #Set variables in the ioT Central PowerShell module
 Set-Globals -BaseUrl $BaseURL -Token $Token
