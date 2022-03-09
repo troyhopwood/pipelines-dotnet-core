@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param(
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-  [SecureString] $iotcapikey,
+  [String] $iotcapikey,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
   [String] $ConfigPath,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
