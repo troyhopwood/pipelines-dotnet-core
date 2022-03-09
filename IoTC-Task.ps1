@@ -1,13 +1,14 @@
 [CmdletBinding()]
 Param(
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
-  [SecureString] $ApiToken,
+  [SecureString] $iotcapikey,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
   [String] $ConfigPath,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true)]
   [String] $AppName
 )
 
+$ApiToken = $iotcapikey
 $Header = @{"authorization" = $ApiToken}
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
