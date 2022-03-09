@@ -20,7 +20,7 @@ steps:
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
-    script: 'Write-Host "API Token:" $iotcapikey'
+    script: 'Write-Host "API Token:" $env:iotcapikey'
 - task: PowerShell@2
   inputs:
     filePath: 'IoTC-Task.ps1'
