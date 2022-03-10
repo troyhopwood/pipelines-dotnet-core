@@ -11,7 +11,7 @@ Param(
 $Header = @{"authorization" = $ApiToken}
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
-$ConfigPath = Get-Location
+$ConfigPath = Get-Location"\$ConfigPath"
 Write-Host "Location: $ConfigPath"
 
 #Set Global Variables that are used in all functions
@@ -538,7 +538,7 @@ if($ContentEqual){
     
 }
 else{
-    Write-Host  "##vso[task.LogIssue type=warning;]     Device groups do not match config file. Device groups will need to be manually updated in the target app"
+    Write-Host  "##vso[task.LogIssue type=warning;] Device groups do not match config file. Device groups will need to be manually updated in the target app."
 }
 }
 
@@ -573,7 +573,6 @@ $ConfigExportsObj = $ConfigExports | ConvertFrom-Json
 $ContentEqual = ($CloudExports -eq $ConfigExports)
 if($ContentEqual){
     Write-Host "     Data exports match config "
-    2
 }
     else{
         #Iterate through data exports in config file to find the missing exports
@@ -649,7 +648,7 @@ Write-Host "     Roles match config "
 
 }
 else{
-Write-Host  "##vso[task.LogIssue type=warning;]     Roles do not match the config file. Roles will need to be manually updated in the target app."
+Write-Host  "##vso[task.LogIssue type=warning;] Roles do not match the config file. Roles will need to be manually updated in the target app."
 }
 
 #Compare File Uploads to Config
