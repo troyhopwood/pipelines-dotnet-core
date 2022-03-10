@@ -11,7 +11,8 @@ Param(
 $Header = @{"authorization" = $ApiToken}
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
-$ConfigPath = Get-Location"\$ConfigPath"
+$Location = Get-Location
+$ConfigPath = "$Location\$ConfigPath"
 Write-Host "Location: $ConfigPath"
 
 #Set Global Variables that are used in all functions
