@@ -18,6 +18,7 @@ steps:
     SecretsFilter: '*'
     RunAsPreJob: false
 - task: PowerShell@2
+  displayName: 'IoT Central'
   inputs:
     filePath: 'IoTC-Task.ps1'
     arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" '
