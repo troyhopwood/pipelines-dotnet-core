@@ -1,5 +1,5 @@
 {
-  "displayName": "Nerf Gun v2",
+  "displayName": "Coffee Brewer V2",
   "capabilityModel": {
     "@id": "dtmi:nerf:NerfGun_79h;2",
     "@type": "Interface",
