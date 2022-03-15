@@ -1,5 +1,5 @@
 {
-  "displayName": "Test Definition2",
+  "displayName": "Prototype",
   "capabilityModel": {
     "@id": "dtmi:nerf:testCapabilityModel;1",
     "@type": "Interface",
