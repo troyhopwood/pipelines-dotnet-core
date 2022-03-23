@@ -64,7 +64,7 @@ Function Set-Globals{
     )
     $Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
     
-    Write-Host "URI: " $Uri
+    Write-Host $Model
     
     $Parameters = @{
     Method      = "PUT"
