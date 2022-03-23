@@ -52,9 +52,6 @@ Write-Host "`nChecking device models and applying updates"
 #Compare Device Models
 $Files = Get-ChildItem "$ConfigPath/IoTC Configuration/Device Models" -Filter *.json 
 $Files | Foreach-Object {
-    
-    Write-Host "Device Model: " $_.FullName
-
     $Model = Get-Content -Raw $_.FullName
     $JObject = $model | ConvertFrom-Json
     $JObject | ForEach-Object {
@@ -63,6 +60,9 @@ $Files | Foreach-Object {
         
         #Get the model if it exists
         $CloudModel = Get-CleanDeviceModel -DeviceTemplateId $id -ErrorAction stop
+
+        Write-Host $CloudModel
+        
         if($CloudModel -eq "404"){
             #It doesn't exist so we need to add it
             Write-Host "     Uploading model $Name to IoT Central"
