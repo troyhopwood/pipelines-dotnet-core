@@ -25,7 +25,7 @@ $Location = Get-Location
 $ConfigPath = "$Location/$ConfigPath"
 Write-Host "Location: $ConfigPath"
 
-. "$location\IoTC-Helper.ps1"
+#. "$location\IoTC-Helper.ps1"
 
 
 
