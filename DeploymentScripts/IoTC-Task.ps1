@@ -24,7 +24,7 @@ $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 $Location = Get-Location
 $ConfigPath = "$Location/$ConfigPath"
 Write-Host "Location: $ConfigPath"
-
+Write-Host $location"\IoTC-Helper.ps1"
 #. "$location\IoTC-Helper.ps1"
 
 
