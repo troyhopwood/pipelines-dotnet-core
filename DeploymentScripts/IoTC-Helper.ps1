@@ -63,7 +63,9 @@ Function Set-Globals{
     [Parameter(Mandatory=$true,Position=1)] [String]$Model
     )
     $Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
-    # $Model = Add-ETagToModel $Etag $Model      
+    
+    Write-Host "URI: " $Uri
+    
     $Parameters = @{
     Method      = "PUT"
     Uri         = $Uri
