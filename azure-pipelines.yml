@@ -20,7 +20,7 @@ steps:
 - task: PowerShell@2
   displayName: 'IoT Central'
   inputs:
-    filePath: 'IoTC-Task.ps1'
+    filePath: 'Deployment Scripts/IoTC-Task.ps1'
     arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" '
     pwsh: true
     
