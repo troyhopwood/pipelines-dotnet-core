@@ -21,11 +21,14 @@ Param(
 $Header = @{"authorization" = $ApiToken}
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
+Write-Host "Header: " $Header
+Write-Host "BaseUrl: " $BaseUrl
+
 $Location = Get-Location
 $ConfigPath = "$Location/$ConfigPath"
 Write-Host "Location: $ConfigPath"
-Write-Host $location"/DeploymentScripts/IoTC-Helper.ps1"
-. "$location/DeploymentScripts/IoTC-Helper.ps1"
+
+. "$location\IoTC-Helper.ps1"
 
 
 
