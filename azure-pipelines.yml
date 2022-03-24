@@ -23,6 +23,7 @@ steps:
     filePath: 'DeploymentScripts/IoTC-Task.ps1'
     arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" '
     pwsh: true
+    failOnStderr:  true
     
 - script: dotnet build --configuration $(buildConfiguration)
   displayName: 'dotnet build $(buildConfiguration)'
