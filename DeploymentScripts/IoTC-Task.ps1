@@ -16,6 +16,7 @@ Param(
 $Header = @{"authorization" = $ApiToken }
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 $Location = Get-Location
+$ConfigPath = "Configs/Prod/IoTC Configuration"
 $ConfigPath = "$Location/$ConfigPath"
 
 . "$location\DeploymentScripts\IoTC-Helper.ps1"
