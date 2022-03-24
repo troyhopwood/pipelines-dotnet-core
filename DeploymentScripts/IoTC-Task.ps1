@@ -10,15 +10,13 @@ Param(
 
 #TODO:
 # Ensure I properly pull values out of JSON object
-# Delete IoTC-Config directory in the root in GitHub
 # Add error handling and log errors to pipeline
-# Look for other TODOs in files
+
 
 $Header = @{"authorization" = $ApiToken }
 $BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 $Location = Get-Location
 $ConfigPath = "$Location/$ConfigPath"
-Write-Host "Location: $ConfigPath"
 
 . "$location\DeploymentScripts\IoTC-Helper.ps1"
 
@@ -26,12 +24,12 @@ Write-Host "##[section]Checking the specified directory"
 #Ensure the expected directories exist
 if ((test-path "$ConfigPath/IoTC Configuration") -eq $False) {
     Write-Host "##[error]Directory not found: $ConfigPath/IoTC Configuration"
-    Exit
+    throw [System.IO.FileNotFoundException] "Directory $ConfigPath/IoTC Configuration Models not found."
 }
 
 if ((test-path "$ConfigPath/IoTC Configuration/Device Models") -eq $False) {
     Write-Host "##[error]Directory not found: $ConfigPath/IoTC Configuration/Device Models"
-    Exit
+    throw [System.IO.FileNotFoundException] "Directory $ConfigPath/IoTC Configuration/Device Models not found."
 }
 
 #Load the desired config
@@ -109,7 +107,6 @@ else {
     }
 }
 
-#TODO: Need to figure out how 
 #Compare Data Exports to Config
 $ConfigExportsObj = $ConfigObj."data exports"
 if ($ConfigExportsObj.length -eq 0) {
