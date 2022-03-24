@@ -12,39 +12,38 @@ Param(
 # Ensure I properly pull values out of JSON object
 # Add error handling and log errors to pipeline
 
-
-$Header = @{"authorization" = $ApiToken }
-$BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
 $ConfigPath = "$Location/$ConfigPath"
+$Header = @{"authorization" = $ApiToken }
+$BaseUrl = "https://" + $AppName + ".azureiotcentral.com/api/"
 
 . "$location\DeploymentScripts\IoTC-Helper.ps1"
 
 Write-Host "##[section]Checking the specified directory"
 #Ensure the expected directories exist
-if ((test-path "$ConfigPath/IoTC Configuration") -eq $False) {
-    Write-Host "##[error]Directory not found: $ConfigPath/IoTC Configuration"
-    throw [System.IO.FileNotFoundException] "Directory $ConfigPath/IoTC Configuration Models not found."
+if ((test-path "$ConfigPath") -eq $False) {
+    Write-Host "##[error]Directory not found: $ConfigPath"
+    throw [System.IO.FileNotFoundException] "Directory $ConfigPath Models not found."
 }
 
-if ((test-path "$ConfigPath/IoTC Configuration/Device Models") -eq $False) {
-    Write-Host "##[error]Directory not found: $ConfigPath/IoTC Configuration/Device Models"
-    throw [System.IO.FileNotFoundException] "Directory $ConfigPath/IoTC Configuration/Device Models not found."
+if ((test-path "$ConfigPath/Device Models") -eq $False) {
+    Write-Host "##[error]Directory not found: $ConfigPath/Device Models"
+    throw [System.IO.FileNotFoundException] "Directory $ConfigPath/Device Models not found."
 }
 
 #Load the desired config
 try{
-$ConfigObj = Get-Content -path "$ConfigPath/IoTC Configuration2/IoTC-Config.json" | ConvertFrom-Json -ErrorAction stop
+$ConfigObj = Get-Content -path "$ConfigPath/IoTC-Config.json" | ConvertFrom-Json -ErrorAction stop
 }
 catch{
-    Write-Host "##[error]Unable to load config file -path $ConfigPath/IoTC Configuration/IoTC-Config.json"
+    Write-Host "##[error]Unable to load config file -path $ConfigPath/IoTC-Config.json"
     throw
 }
 
 Write-Host "##[section]Checking device models and applying updates"
 #Compare Device Models
-$Files = Get-ChildItem "$ConfigPath/IoTC Configuration/Device Models" -Filter *.json 
+$Files = Get-ChildItem "$ConfigPath/Device Models" -Filter *.json 
 $Files | Foreach-Object {
     $Model = Get-Content -Raw $_.FullName
     $JObject = $model | ConvertFrom-Json
