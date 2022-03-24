@@ -11,12 +11,21 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+- script: dotnet build --configuration $(buildConfiguration)
+  displayName: 'dotnet build $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+
 - task: AzureKeyVault@2
   inputs:
     azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
     KeyVaultName: 'troyhopkeyvault'
     SecretsFilter: '*'
     RunAsPreJob: false
+
 - task: PowerShell@2
   displayName: 'IoT Central'
   inputs:
@@ -24,13 +33,7 @@ steps:
     arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" '
     pwsh: true
     failOnStderr:  true
-    
-- script: dotnet build --configuration $(buildConfiguration)
-  displayName: 'dotnet build $(buildConfiguration)'
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
+
 - task: AzureWebApp@1
   inputs:
     azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
