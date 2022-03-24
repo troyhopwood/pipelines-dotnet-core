@@ -8,10 +8,6 @@ Param(
     [String] $AppName
 )
 
-#TODO:
-# Ensure I properly pull values out of JSON object
-# Add error handling and log errors to pipeline
-
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
 $ConfigPath = "$Location/$ConfigPath"
@@ -33,13 +29,8 @@ if ((test-path "$ConfigPath/Device Models") -eq $False) {
 }
 
 #Load the desired config
-try{
 $ConfigObj = Get-Content -path "$ConfigPath/IoTC-Config.json" | ConvertFrom-Json -ErrorAction stop
-}
-catch{
-    Write-Host "##[error]Unable to load config file -path $ConfigPath/IoTC-Config.json"
-    throw
-}
+
 
 Write-Host "##[section]Checking device models and applying updates"
 #Compare Device Models
@@ -145,16 +136,16 @@ else {
             $name = $_.displayName
             $record = $_ | ConvertTo-Json -Depth 100 -Compress
 
-            if (($CloudExports.Length -eq 0) -or ($CloudExports -inotmatch $id)) { #We need to add this data export
+            if (($CloudExports.Length -eq 0) -or ($CloudExports -inotmatch $id)) {
+                #We need to add this data export
                 Write-Host "     Adding missing data export $name "
                 $Config = $_ | ConvertTo-Json -Depth 100 -Compress
                 $Config = Add-DataExport -Config $Config -DataExportId $id
-                
             }
-            elseif (($CloudExports.Length -gt 0) -and (!$cloudExports.Contains($Record))) { #We need to update this data export
+            elseif (($CloudExports.Length -gt 0) -and (!$cloudExports.Contains($Record))) {
+                #We need to update this data export
                 Write-Host "     Updating existing data export $name "
                 $Config = Add-DataExport -Config $Record -DataExportId $id
-                
             }
             else {
                 Write-Host "     Processing data export $name "
@@ -173,24 +164,23 @@ $ConfigOrgs = $ConfigOrgsObj | ConvertTo-Json -Depth 100 -Compress
 $ContentEqual = ($CloudOrgs -eq $ConfigOrgs)
 if ($ContentEqual) {
     Write-Host "     Organizations match config "
-
 }
 else {
     #Iterate through orgs in config file to find the missing orgs
     $ConfigOrgsObj."value" | ForEach-Object {
         $id = $_.id
         $name = $_.displayName
-        if ($CloudOrgs -inotmatch $id) { #We need to add this org
+        if ($CloudOrgs -inotmatch $id) {
+            #We need to add this org
             Write-Host "     Adding missing organization $name "
             $Config = $_ | ConvertTo-Json -Depth 100 -Compress
             $Config = Add-Org -Config $Config -OrgId $_.id
-            
         }
-        elseif ($CloudOrgs -inotmatch $_) { #We need to update this org
+        elseif ($CloudOrgs -inotmatch $_) {
+            #We need to update this org
             Write-Host "     Updating existing org $name"
             $Config = $_ | ConvertTo-Json -Depth 100 -Compress
             $Config = Add-Org -Config $Config -OrgId $id
-            
         }    
     }
 }
@@ -229,7 +219,6 @@ else {
 
     if ($ContentEqual) {
         Write-Host "     File uploads match config "
-    
     }
     else {
         if ($CloudUploads -eq "404") {
@@ -237,7 +226,6 @@ else {
             Write-Host "     Adding file uploads config to IoT Central "
             $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
             $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
-        
         }
         else {
             #We need to update the existing config
