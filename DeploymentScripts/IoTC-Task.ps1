@@ -40,7 +40,7 @@ $ConfigObj = Get-Content -path "$ConfigPath/IoTC Configuration2/IoTC-Config.json
 }
 catch{
     Write-Host "##[error]Unable to load config file -path $ConfigPath/IoTC Configuration/IoTC-Config.json"
-    Exit
+    throw
 }
 
 Write-Host "##[section]Checking device models and applying updates"
