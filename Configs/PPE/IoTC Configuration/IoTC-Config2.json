@@ -1,0 +1,351 @@
+{
+  "roles": {
+    "value": [
+      {
+        "id": "ca310b8d-2f4a-44e0-a36e-957c202cd8d4",
+        "displayName": "Administrator"
+      },
+      {
+        "id": "ae2c9854-393b-4f97-8c42-479d70ce626e",
+        "displayName": "Operator"
+      },
+      {
+        "id": "344138e9-8de4-4497-8c54-5237e96d6aaf",
+        "displayName": "Builder"
+      },
+      {
+        "id": "c495eb57-eb18-489e-9802-62c474e5645c",
+        "displayName": "Org Admin"
+      },
+      {
+        "id": "84cc62c1-dabe-49d3-b16e-8b291232b285",
+        "displayName": "Org Viewer"
+      },
+      {
+        "id": "b4935647-30e4-4ed3-9074-dcac66c2f8ef",
+        "displayName": "Org Operator"
+      }
+    ]
+  },
+  "organizations": {
+    "value": [
+      {
+        "id": "org1-26kvlq7561g",
+        "displayName": "Org1 with new name"
+      },
+      {
+        "id": "480e3d53-05bb-407f-990e-ef71b336f054",
+        "displayName": "Aardvark II"
+      },
+      {
+        "id": "d049487e-b12b-41cd-b4a9-dc24727c0659",
+        "displayName": "Aardvark"
+      },
+      {
+        "id": "sub-org-qwqw3wprlz",
+        "displayName": "Sub Org",
+        "parent": "org1-26kvlq7561g"
+      },
+      {
+        "id": "whatthe",
+        "displayName": "Seattle"
+      },
+      {
+        "id": "ab49487e-b34a-aacd-b6a1-dc24727c06aa",
+        "displayName": "ManuallyCreated"
+      },
+      {
+        "id": "this-is-an-id-not-a-name",
+        "displayName": "this-is-an-id-not-a-name"
+      }
+    ]
+  },
+  "file uploads": {
+    "connectionString": "DefaultEndpointsProtocol=https;AccountName=nerfcicd;AccountKey=KQUmRfgUGeiiX6+GX9b9QwbjymweGEAC3M0Sre2FFsPR8qTSux7UIEfhHl3asT1FfpCkN7j3ZLql+ASthPIUag==;EndpointSuffix=core.windows.net",
+    "container": "nerf",
+    "sasTtl": "PT1H"
+  },
+  "jobs": {
+    "value": [
+      {
+        "id": "e4dc8c61-406f-4e60-8927-514ebee173d3",
+        "displayName": "Scheduled Job - 3",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "81bbbc21-ac2c-443e-80dc-0c36f40344b9",
+        "displayName": "Scheduled Job - 2",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "8a33cafe-306e-4d27-83e0-484e25acf9ca",
+        "displayName": "Scheduled Job - 1",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "21df26f2-bec8-4270-9447-bb09e814c1eb",
+        "displayName": "Arm Gun - PS",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "c2186dbe-db2e-420a-b322-2a792daf3c66",
+        "displayName": "Arm Gun - PS",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "c4ebf156-d424-46fd-bf4a-af3a26da4983",
+        "displayName": "Arm Gun - PS",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "006cfe7d-2b4e-4123-b7f5-cb67526e0a1e",
+        "displayName": "Arm Gun - PS",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "f2e5a8b1-4ce0-4dae-8670-3404429348f7",
+        "displayName": "Arm Gun - PS",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "741d371d-f414-40c8-b117-8e5cbbab1365",
+        "displayName": "Arm Gun - 3",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "8d6a92c9-f76a-4de4-b8e3-4172bf505b3e",
+        "displayName": "Arm Gun - 2",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      },
+      {
+        "id": "f8c805af-51fd-40d9-a505-ddbabd500a5f",
+        "displayName": "Arm Gun - 1",
+        "description": "",
+        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "data": [
+          {
+            "type": "command",
+            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
+            "path": "Arm"
+          }
+        ],
+        "status": "complete"
+      }
+    ]
+  },
+  "device groups": {
+    "value": [
+      {
+        "id": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "displayName": "Nerf Gun - All devices"
+      },
+      {
+        "id": "7175cc46-a239-4179-b8b3-13dd96720957",
+        "displayName": "Nerf Gun v2 - All devices"
+      },
+      {
+        "id": "17ef06dd-0042-4245-b3be-7728029f9af0",
+        "displayName": "undefined - All devices"
+      },
+      {
+        "id": "c6d52600-eb8c-4511-b25c-46bf207ddf7b",
+        "displayName": "Test Definition2 - All devices"
+      }
+    ]
+  },
+  "data exports": {
+    "value": [
+      {
+        "id": "192dbb3a-8e40-4705-9654-d9fa51ace2fd",
+        "displayName": "TelemetryExport",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:contoso:hln_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39",
+            "transform": "{\n    schema: \"default@v1\",\n    applicationId: .applicationId,\n    deviceId: .device.id,\n    templateId: .device.templateId,\n    messageSource: .messageSource,\n    enqueuedTime: .enqueuedTime,\n    telemetry: .telemetry | map({ key: .name, value: .value }) | from_entries,\n    messageProperties: .messageProperties,\n    enrichments: .enrichments,\n    component: .component,\n    cloudProperties: .cloudProperties,\n    module: .module\n}"
+          }
+        ],
+        "status": "degraded"
+      },
+      {
+        "id": "2d0cf374-d005-4ddf-a7cf-28f4b17c8375",
+        "displayName": "Delete1",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "degraded"
+      },
+      {
+        "id": "693be51f-686d-42e8-ab0e-3d566e59aac5",
+        "displayName": "Delete2-Updated",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "degraded"
+      },
+      {
+        "id": "df3a7e16-5e21-4106-a3a0-06e7f46ed26a",
+        "displayName": "Properties",
+        "enabled": true,
+        "source": "properties",
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "degraded"
+      },
+      {
+        "id": "e328c80b-ff83-45b9-9858-bf0d18986826",
+        "displayName": "Delete1",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "degraded"
+      }
+    ]
+  }
+}
