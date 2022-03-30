@@ -7,14 +7,14 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppName
 )
-Install-Module AzureRM.KeyVault
-Import-Module AzureRM.KeyVault
+
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $VaultName = "cicd-nerf" #TODO: Make this a parameter
         # $SecretName = "FileUplaod$AppName"
-        Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
+        #Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
+        az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
 $Location = Get-Location
