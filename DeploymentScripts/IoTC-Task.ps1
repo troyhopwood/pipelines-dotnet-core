@@ -5,7 +5,9 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $ConfigPath,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [String] $AppName
+    [String] $AppName,
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String] $DeploymentPipelineSP
 )
 
 Write-Host "Trying to write to Key Vault"
