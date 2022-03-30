@@ -8,6 +8,14 @@ Param(
     [String] $AppName
 )
 
+Write-Host "Trying to write to Key Vault"
+$SecretName = "test"
+$Secret = ConvertTo-SecureString "foo" -AsPlainText 
+$VaultName = "cicd-nerf" #TODO: Make this a parameter
+        # $SecretName = "FileUplaod$AppName"
+        Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
+Write-Host "Done writing to Key Vault"
+
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
 $ConfigPath = "$Location/$ConfigPath"
