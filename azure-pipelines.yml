@@ -26,20 +26,19 @@ steps:
     SecretsFilter: '*'
     RunAsPreJob: false
 
-- task: AzurePowerShell@5
+- task: AzureCLI@2
   inputs:
     azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
-    ScriptType: 'FilePath'
-    ScriptPath: 'DeploymentScripts/IoTC-Task.ps1'
-    ScriptArguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf"'
-    azurePowerShellVersion: 'LatestVersion'
-    pwsh: true 
+    scriptType: 'pscore'
+    scriptLocation: 'scriptPath'
+    scriptPath: 'DeploymentScripts/IoTC-Task.ps1'
+    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" -DeploymentPipelineSP "$(DeploymentPipelineSP)'
 
 - task: PowerShell@2
   displayName: 'IoT Central'
   inputs:
     filePath: 'DeploymentScripts/IoTC-Task.ps1'
-    arguments: ''
+    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf"'
     pwsh: true
     failOnStderr:  true
 
