@@ -13,7 +13,9 @@ $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $VaultName = "cicd-nerf" #TODO: Make this a parameter
         # $SecretName = "FileUplaod$AppName"
-        Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
+        #Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
+        az login --service-principal --username deploymentpipeline --password $DeploymentPipelineSP
+        az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
 $Location = Get-Location
