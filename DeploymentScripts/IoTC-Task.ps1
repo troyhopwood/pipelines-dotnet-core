@@ -7,6 +7,7 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppName
 )
+Install-Module AzureRM.KeyVault
 Import-Module AzureRM.KeyVault
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
