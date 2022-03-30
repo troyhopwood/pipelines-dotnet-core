@@ -30,7 +30,7 @@ steps:
   displayName: 'IoT Central'
   inputs:
     filePath: 'DeploymentScripts/IoTC-Task.ps1'
-    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" -DeploymentPipelineSP "${DeploymentPipelineSP}'
+    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" -DeploymentPipelineSP "$(DeploymentPipelineSP)'
     pwsh: true
     failOnStderr:  true
 
