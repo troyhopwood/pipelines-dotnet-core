@@ -3,7 +3,7 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $ApiToken,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [String] $ConfigPath,
+    [String] ${ConfigPath},
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppName,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
