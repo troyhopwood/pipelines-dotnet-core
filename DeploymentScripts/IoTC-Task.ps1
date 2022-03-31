@@ -7,15 +7,19 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppName,
     [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-    [String] $ServicePrincipal
+    [String] $ServicePrincipalPassword,
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+    [String] $AppId,
+    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+    [String] $KeyVault
 )
 
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $foo = ConvertTo-SecureString "SJaYx.BVXEHj1FRrZ.CjTo5d.a.hcB2H.q" -AsPlainText 
-$VaultName = "cicd-nerf" #TODO: Make this a parameter
-        az login --service-principal --username "1783230e-32eb-4410-852b-2d132423b484" --password "SJaYx.BVXEHj1FRrZ.CjTo5d.a.hcB2H.q" --tenant "72f988bf-86f1-41af-91ab-2d7cd011db47"
+$VaultName = $KeyVault
+        az login --service-principal --username $AppId --password $ServicePrincipalPassword
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
