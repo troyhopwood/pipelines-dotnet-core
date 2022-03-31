@@ -3,19 +3,15 @@ Param(
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $ApiToken,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [String] ${ConfigPath},
+    [String] $ConfigPath,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [String] $AppName,
-    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-    [String] $DeploymentPipelineSP
+    [String] $AppName
 )
 
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $VaultName = "cicd-nerf" #TODO: Make this a parameter
-        # $SecretName = "FileUplaod$AppName"
-        #Set-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName -SecretValue $Secret
         az login --service-principal --username deploymentpipeline --password $DeploymentPipelineSP
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
