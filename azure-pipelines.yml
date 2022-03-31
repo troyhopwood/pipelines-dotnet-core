@@ -30,7 +30,7 @@ steps:
   displayName: 'IoT Central'
   inputs:
     filePath: 'DeploymentScripts/IoTC-Task.ps1'
-    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" -ServicePrincipalPassword $(DeploymentPipelineSP) -AppId "1783230e-32eb-4410-852b-2d132423b484" -KeyVault "cicd-nerf" '
+    arguments: '-ApiToken "$(iotcapikey)" -ConfigPath "Configs/Prod" -AppName "nerf" -ServicePrincipalPassword "$(DeploymentPipelineSP)"" -AppId "1783230e-32eb-4410-852b-2d132423b484" -KeyVault "cicd-nerf" '
     pwsh: true
     failOnStderr:  true
 
