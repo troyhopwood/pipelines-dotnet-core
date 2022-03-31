@@ -6,12 +6,14 @@ Param(
     [String] $ConfigPath,
     [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppName,
-    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $ServicePrincipalPassword,
-    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
     [String] $AppId,
-    [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-    [String] $KeyVault
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String] $KeyVault,
+    [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+    [String] $TenantId
 )
 
 Write-Host "Trying to write to Key Vault"
@@ -19,7 +21,7 @@ $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $foo = ConvertTo-SecureString "SJaYx.BVXEHj1FRrZ.CjTo5d.a.hcB2H.q" -AsPlainText 
 $VaultName = $KeyVault
-        az login --service-principal --username $AppId --password $ServicePrincipalPassword --tenant "72f988bf-86f1-41af-91ab-2d7cd011db47"
+        az login --service-principal --username $AppId --password $ServicePrincipalPassword --tenant $TenantId
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
