@@ -56,8 +56,6 @@ $Files | Foreach-Object {
         #Get the model if it exists
         $CloudModel = Get-CleanDeviceModel -DeviceTemplateId $id -ErrorAction stop
 
-        Write-Host $CloudModel
-
         if ($CloudModel -eq "404") {
             #It doesn't exist so we need to add it
             Write-Host "     Uploading model $Name to IoT Central"
