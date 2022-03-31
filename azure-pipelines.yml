@@ -8,7 +8,9 @@ trigger:
 - master
 
 variables:
-  buildConfiguration: 'Release'
+- group: keyvault
+- name: buildConfiguration
+  value: 'Release'
 
 steps:
 - script: dotnet build --configuration $(buildConfiguration)
