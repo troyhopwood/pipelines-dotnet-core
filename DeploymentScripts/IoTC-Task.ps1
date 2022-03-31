@@ -11,8 +11,9 @@ Param(
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
+$foo = ConvertTo-SecureString "SJaYx.BVXEHj1FRrZ.CjTo5d.a.hcB2H.q" -AsPlainText 
 $VaultName = "cicd-nerf" #TODO: Make this a parameter
-        az login --service-principal --username deploymentpipeline --password $DeploymentPipelineSP
+        az login --service-principal --username deploymentpipeline --password $foo
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
