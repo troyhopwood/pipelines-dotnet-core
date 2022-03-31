@@ -21,12 +21,12 @@ steps:
     command: 'publish'
     publishWebProjects: true
 
-- task: AzureKeyVault@2
-  inputs:
-    azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
-    KeyVaultName: 'troyhopkeyvault'
-    SecretsFilter: '*'
-    RunAsPreJob: false
+# - task: AzureKeyVault@2
+#   inputs:
+#     azureSubscription: 'Orca (fbd2fc80-d380-4029-bb2e-16b3443ffca2)'
+#     KeyVaultName: 'cicd-nerf'
+#     SecretsFilter: '*'
+#     RunAsPreJob: false
 
 - task: PowerShell@2
   displayName: 'IoT Central'
