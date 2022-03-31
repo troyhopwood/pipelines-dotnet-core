@@ -20,7 +20,7 @@ $Secret = ConvertTo-SecureString "foo" -AsPlainText
 $foo = ConvertTo-SecureString "SJaYx.BVXEHj1FRrZ.CjTo5d.a.hcB2H.q" -AsPlainText 
 $VaultName = $KeyVault
         az login --service-principal --username $AppId --password $ServicePrincipalPassword
-        az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
+        az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret --tenant "72f988bf-86f1-41af-91ab-2d7cd011db47"
 Write-Host "Done writing to Key Vault"
 
 $Location = Get-Location
