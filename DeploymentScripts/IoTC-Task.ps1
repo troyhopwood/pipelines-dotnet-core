@@ -20,7 +20,7 @@ Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = ConvertTo-SecureString "foo" -AsPlainText 
 $VaultName = $KeyVault
-        az login --service-principal --username $AppId --password $ServicePrincipalPassword --tenant $TenantId
+        az login --service-principal --username $AppId --password (ConvertFrom-SecureString -SecureString $ServicePrincipalPassword -AsPlainText)  --tenant $TenantId
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
