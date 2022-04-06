@@ -16,6 +16,8 @@ Param(
     [String] $TenantId
 )
 
+#####################################################
+#TODO: Move this into the appropriate places for Creating Destinations
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
 $Secret = "foo"
@@ -29,8 +31,9 @@ $Bar = $Foo | ConvertFrom-Json
 $FoobarValue = $Bar.value
 
 Write-Host "Raw secret from keyvalut: " $Bar.value
-$FoobarValue = $Bar.value | ConvertFrom-SecureString -AsPlainText
-Write-Host "Secret from Keyvault as plain text: $FoobarValue"
+
+#######################################################
+
 
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
