@@ -18,15 +18,16 @@ Param(
 
 Write-Host "Trying to write to Key Vault"
 $SecretName = "test"
-$Secret = ConvertTo-SecureString "foo" -AsPlainText 
+$Secret = "foo"
 $VaultName = $KeyVault
         az login --service-principal --username $AppId --password (ConvertFrom-SecureString -SecureString $ServicePrincipalPassword -AsPlainText)  --tenant $TenantId
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
 $Foobar = az keyvault secret show --vault-name $VaultName --name $SecretName 
+Write-Host "Raw secret from keyvalut: $Foobar"
 $FoobarValue = $Foobar.value | ConvertFrom-SecureString -AsPlainText
-Write-Host "Secret from Keyvault = $FoobarValue"
+Write-Host "Secret from Keyvault as plain text: $FoobarValue"
 
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
