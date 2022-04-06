@@ -25,7 +25,7 @@ $VaultName = $KeyVault
 Write-Host "Done writing to Key Vault"
 
 $Foobar = az keyvault secret show --vault-name $VaultName --name $SecretName
-Write-Host "Secret from Keyvault = $Foobar"
+Write-Host "Secret from Keyvault = (ConvertFrom-SecureString -SecureString $Foobar.value -AsPlainText)"
 
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
