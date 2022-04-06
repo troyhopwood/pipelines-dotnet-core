@@ -24,9 +24,12 @@ $VaultName = $KeyVault
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
-$Foobar = az keyvault secret show --vault-name $VaultName --name $SecretName 
-Write-Host "Raw secret from keyvalut: $Foobar.value"
-$FoobarValue = $Foobar.value | ConvertFrom-SecureString -AsPlainText
+$Foo = az keyvault secret show --vault-name $VaultName --name $SecretName 
+$Bar = $Foo | ConvertFrom-Json
+$FoobarValue = $Bar.value
+
+Write-Host "Raw secret from keyvalut: " $Bar.value
+$FoobarValue = $Bar.value | ConvertFrom-SecureString -AsPlainText
 Write-Host "Secret from Keyvault as plain text: $FoobarValue"
 
 $Location = Get-Location
