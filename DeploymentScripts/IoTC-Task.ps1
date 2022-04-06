@@ -25,7 +25,7 @@ $VaultName = $KeyVault
 Write-Host "Done writing to Key Vault"
 
 $Foobar = az keyvault secret show --vault-name $VaultName --name $SecretName 
-Write-Host "Raw secret from keyvalut: $Foobar"
+Write-Host "Raw secret from keyvalut: $Foobar.value"
 $FoobarValue = $Foobar.value | ConvertFrom-SecureString -AsPlainText
 Write-Host "Secret from Keyvault as plain text: $FoobarValue"
 
