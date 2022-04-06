@@ -24,7 +24,7 @@ $VaultName = $KeyVault
         az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
 Write-Host "Done writing to Key Vault"
 
-$Foobar = (Get-AzKeyVaultSecret -VaultName $VaultName -Name $SecretName).SecretValueText
+$Foobar = (az keyvault secret show -VaultName $VaultName -Name $SecretName).SecretValueText
 Write-Host "Secret from Keyvault = $Foobar"
 
 $Location = Get-Location
