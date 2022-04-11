@@ -60,7 +60,6 @@ Function Update-DeviceModel {
         ContentType = "application/json"
         Body        = $Model
     }
-
     $Result = Invoke-WebRequest @parameters
     $Result.Content
 }
@@ -134,9 +133,7 @@ Function Get-DeviceModel {
     Param(
         [Parameter(Mandatory = $true, Position = 0)] [String]$DeviceTemplateId
     )
-
     $Uri = $BaseUrl + "deviceTemplates/" + $DeviceTemplateId + "?api-version=1.0"
-
     $Body = @{}
     $Parameters = @{
         Method      = "GET"
@@ -161,16 +158,6 @@ Function Get-DeviceModel {
     }
 }
 
-#
-# Function Get-ETagFromModel {
-#     Param(
-#         [Parameter(Mandatory = $true, Position = 0)] [String]$DeviceTemplateId
-#     )
-#     $Model = Get-DeviceModel -DeviceTemplateId $DeviceTemplateId
-#     $ETag = ($Model | ConvertFrom-json).Etag
-#     $ETag = '"\"' + $ETag.Trim('"') + '\""'
-#     $ETag
-# }
 
 #Get list of data exports
 Function Get-DataExports {
@@ -419,3 +406,76 @@ Function Get-Roles {
     $Result = Invoke-WebRequest @parameters
     $Result.Content
 }
+
+#Get list of all API Tokens in the app
+Function Get-Tokens{
+    $Uri = $BaseUrl + "apiTokens?api-version=1.0"
+    $Body = @{}
+    $Parameters = @{
+        Method      = "GET"
+        Uri         = $Uri
+        Headers     = $Header
+        ContentType = "application/json"
+        Body        = $Body
+    }
+
+    $Result = Invoke-WebRequest @parameters
+    $Result.Content
+}
+
+#Create a new API token for the specified role
+Function Add-Token{
+    Param(
+        [Parameter(Mandatory = $true, Position = 0)] [String]$TokenId,
+        [Parameter(Mandatory = $true, Position = 1)] [String]$Config
+    )
+    $Uri = $BaseUrl + "apiTokens/" + $TokenId + "?api-version=1.0"
+    $Parameters = @{
+        Method      = "PUT"
+        Uri         = $Uri
+        Headers     = $Header
+        ContentType = "application/json"
+        Body        = $Config
+    }
+
+    $Result = Invoke-WebRequest @parameters
+    $Result.Content
+}
+
+#Get a list of all data export destinations in the app
+Function Get-CDEDestinations{
+
+Write-Host "Base URL in the gest dest function: " $BaseUrl
+
+    $Uri = $BaseUrl + "dataExport/destinations?api-version=1.1-preview"
+    $Body = @{}
+    $Parameters = @{
+        Method      = "GET"
+        Uri         = $Uri
+        Headers     = $Header
+        ContentType = "application/json"
+        Body        = $Body
+    }
+
+    $Result = Invoke-WebRequest @parameters
+    $Result.Content
+}
+
+#Create a new data export destination
+Function Add-Destination{
+    Param(
+        [Parameter(Mandatory = $true, Position = 0)] [String]$Config
+    )
+    $Uri = $BaseUrl + "dataExport/destinations/destination1?api-version=1.1-preview"
+    $Parameters = @{
+        Method      = "PUT"
+        Uri         = $Uri
+        Headers     = $Header
+        ContentType = "application/json"
+        Body        = $Config
+    }
+
+    $Result = Invoke-WebRequest @parameters
+    $Result.Content
+}
+
