@@ -3,7 +3,7 @@
     "value": [
 {
   "id": "destination1",
-  "displayName": "Webhook No Auth",
+  "displayName": "Test Webhook",
   "type": "webhook@v1",
   "url": "https://webhook.site/9bda8769-d540-4d92-946b-48c5a01e59bd",
   "headerCustomizations": {
