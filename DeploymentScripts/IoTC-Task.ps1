@@ -16,24 +16,7 @@ Param(
     [String] $TenantId
 )
 
-#####################################################
-#TODO: Move this into the appropriate places for Creating Destinations
-Write-Host "Trying to write to Key Vault"
-$SecretName = "test"
-$Secret = "foo"
-$VaultName = $KeyVault
-        az login --service-principal --username $AppId --password (ConvertFrom-SecureString -SecureString $ServicePrincipalPassword -AsPlainText)  --tenant $TenantId
-        az keyvault secret set --name $SecretName --vault-name $VaultName --value $Secret
-Write-Host "Done writing to Key Vault"
-
-$Foo = az keyvault secret show --vault-name $VaultName --name $SecretName 
-$Bar = $Foo | ConvertFrom-Json
-$FoobarValue = $Bar.value
-
-Write-Host "Raw secret from keyvalut: " $Bar.value
-
-#######################################################
-
+az login --service-principal --username $AppId --password (ConvertFrom-SecureString -SecureString $ServicePrincipalPassword -AsPlainText)  --tenant $TenantId
 
 $Location = Get-Location
 $ConfigPath = "Configs/Prod/IoTC Configuration"
@@ -120,6 +103,92 @@ else {
     }
     else {
         Write-Host  "##vso[task.LogIssue type=warning;] Device groups do not match config file. Device groups will need to be manually updated in the target app."
+    }
+}
+
+#Compare Data Export Destinations to Config
+$ConfigDestinationsObj = $ConfigObj."destinations"
+if($ConfigDestinationsObj.length -eq 0){
+    Write-Host "     Data Export Destinations not in config file." -ForegroundColor DarkGray -NoNewLine
+    Write-Host " Skipping" -ForegroundColor green
+}
+else{
+    $CloudDestinationsObj = Get-CDEDestinations -ErrorAction stop
+    $CloudDestinationsObj = $CloudDestinationsObj | ConvertFrom-Json
+
+    #Remove status from both source and target as they could be different
+    $ConfigDestinationsObj."value" | ForEach-Object {
+        $ConfigDestinationsObj.PSObject.Properties.Remove("status")
+    }
+    $CloudDestinationsObj."value" | ForEach-Object {
+        $CloudDestinationsObj.PSObject.Properties.Remove("status")
+    }
+    $CloudDestinations = $CloudDestinationsObj | ConvertTo-Json -Depth 100 -Compress
+    $ConfigDestinations = $ConfigDestinationsObj | ConvertTo-Json -Depth 100 -Compress
+
+    $ContentEqual = ($CloudDestinations -eq $ConfigDestinations)
+    if($ContentEqual){
+        Write-Host "     Data export destinations match config " -ForegroundColor DarkGray -NoNewLine
+        Write-Host @greenCheck
+    }
+    else{
+        #Iterate through destinations in config file to find the missing exports
+        $ConfigDestinationsObj | ForEach-Object {
+            $Id = $_.id
+            $Name = $_.name
+            $ConfigObj = $_.value[0]
+            $ConfigObj.PSObject.Properties.Remove("status")
+            $SecretName = "Undefined"
+
+            switch($ConfigObj.type){
+                "webhook@v1" {
+                    if($Config.headerCustomizations.secret -ne $false){
+                        $SecretName = $ConfigObj.headerCustomizations.secret
+                        $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
+                        $ConfigObj.headerCustomizations.secret = $Secret
+                    }
+                    Break
+                }
+                "dataexplorer@v1" {
+                    Write-Host "Authorization: " $ConfigObj.authorization
+                    $SecretName = $ConfigObj.authorization.clientSecret
+                    Write-Host "Secret name: $SecretName"
+                    $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
+                    $ResultObj = $Result | ConvertFrom-Json
+                    $Secret = $ResultObj.value
+                    $ConfigObj.authorization.clientSecret = $Secret
+                    Break
+                }
+                Default {
+                    $SecretName = $ConfigObj.authorization.connectionString
+                    $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
+                    $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
+                    $ResultObj = $Result | ConvertFrom-Json
+                    $Secret = $ResultObj.value
+                    $ConfigObj.authorization.connectionString = $Secret
+                }
+            }
+
+            $Config = $ConfigObj | ConvertTo-Json -Depth 100 -Compress
+
+            if(($CloudDestinations.Length -eq 0) -or ($CloudDestinations -inotmatch $id)) #We need to add this data export
+            {
+                Write-Host "     Adding missing data export destination $name " -ForegroundColor DarkGray -NoNewline
+                $Result = Add-Destination -Config $Config
+                Write-Host @greenCheck
+            }
+            elseif(($CloudDestinations.Length -gt 0) -and (!$CloudDestinations.Contains($Config))) #We need to update this data export
+            {
+                Write-Host "     Updating existing data export destination $name " -ForegroundColor DarkGray -NoNewline
+                $Result = Add-Destination -Config $Config
+                Write-Host @greenCheck
+            }
+            else{
+                Write-Host "We didn't do anything with data export destinations"
+                Write-Host "Record: $Record"
+                Write-Host "ID: $Id"
+            }
+        }
     }
 }
 
@@ -257,6 +326,46 @@ else {
             Write-Host "     Updating file uploads config in IoT Central "
             $UploadsConfig = $UploadsConfig | ConvertTo-Json -Compress -Depth 100
             $UploadsConfig = Add-FileUploads -Config  $UploadsConfig
+        }
+    }
+}
+
+
+#Compare API Tokens to Config
+$CloudTokens = Get-Tokens -ErrorAction stop
+$CloudTokensObj = $CloudTokens | ConvertFrom-Json
+$TokensConfig = $ConfigObj."APITokens"
+
+if($TokensConfig.length -eq 0){
+    Write-Host "     API Tokens not in config file." -ForegroundColor DarkGray -NoNewLine
+    Write-Host " Skipping" -ForegroundColor green
+}
+else{
+    $ContentEqual = ($CloudTokensObj | ConvertTo-Json -Compress -Depth 100) -eq ($TokensConfig | ConvertTo-Json -Compress -Depth 100)
+
+    if($ContentEqual){
+        Write-Host "     API tokens match config " -ForegroundColor DarkGray -NoNewLine
+        Write-Host @greenCheck
+    }
+    else{
+        #Iterate through API tokens in config file to find the missing tokens
+        $TokensConfig."value" | ForEach-Object {
+            $id = $_.id
+            $_.PSObject.Properties.remove("expiry")
+            
+            if($CloudTokens -inotmatch $id) #We need to add this API token
+            {
+                Write-Host "     Adding missing API token $id " -ForegroundColor DarkGray -NoNewline
+                $Config = $_ | ConvertTo-Json -Depth 100 -Compress
+                $Result = Add-Token -TokenId $id -Config $Config
+                $Result = $Result | ConvertFrom-Json
+                $Secret = ConvertTo-SecureString $Result.token -AsPlainText
+                Write-Host "SECRET: $Secret"
+                Set-AzKeyVaultSecret -VaultName $VaultName -Name $_.id -SecretValue $Secret
+                #az keyvault secret set --name $_.id --vault-name $VaultName --value $Secret
+                Write-Host @greenCheck
+
+            }
         }
     }
 }
