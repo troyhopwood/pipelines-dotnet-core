@@ -444,9 +444,6 @@ Function Add-Token{
 
 #Get a list of all data export destinations in the app
 Function Get-CDEDestinations{
-
-Write-Host "Base URL in the gest dest function: " $BaseUrl
-
     $Uri = $BaseUrl + "dataExport/destinations?api-version=1.1-preview"
     $Body = @{}
     $Parameters = @{
@@ -478,4 +475,3 @@ Function Add-Destination{
     $Result = Invoke-WebRequest @parameters
     $Result.Content
 }
-
