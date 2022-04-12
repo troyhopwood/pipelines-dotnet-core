@@ -1,4 +1,41 @@
 {
+  "destinations": {
+    "value": [
+{
+  "id": "destination1",
+  "displayName": "Webhook No Auth",
+  "type": "webhook@v1",
+  "url": "https://webhook.site/9bda8769-d540-4d92-946b-48c5a01e59bd",
+  "headerCustomizations": {
+    "x-custom-region": {
+      "value": "westcentralus",
+      "secret": false
+    }
+  },
+  "status": "waiting"
+}
+    ]
+  },
+  "device groups": {
+    "value": [
+      {
+        "id": "48644781-d4cb-4945-9d94-e817e1b50150",
+        "displayName": "Nerf Gun - All devices"
+      },
+      {
+        "id": "606ee75a-4cf0-4a69-896b-e4fb6534e951",
+        "displayName": "Nerf Gun v2 - All devices"
+      },
+      {
+        "id": "3959076b-afed-4779-a797-f5c61eb5ba49",
+        "displayName": "Test Definition2 - All devices"
+      },
+      {
+        "id": "aab3ee8a-5792-44af-9088-271b93531bf8",
+        "displayName": "MXCHIP Getting Started Guide - All devices"
+      }
+    ]
+  },
   "roles": {
     "value": [
       {
@@ -26,6 +63,11 @@
         "displayName": "Org Operator"
       }
     ]
+  },
+  "file uploads": {
+    "connectionString": "FileUplaodnerf",
+    "container": "nerf",
+    "sasTtl": "PT1H"
   },
   "organizations": {
     "value": [
@@ -60,10 +102,141 @@
       }
     ]
   },
-  "file uploads": {
-    "connectionString": "DefaultEndpointsProtocol=https;AccountName=nerfcicd;AccountKey=KQUmRfgUGeiiX6+GX9b9QwbjymweGEAC3M0Sre2FFsPR8qTSux7UIEfhHl3asT1FfpCkN7j3ZLql+ASthPIUag==;EndpointSuffix=core.windows.net",
-    "container": "nerf",
-    "sasTtl": "PT1H"
+  "data exports": {
+    "value": [
+      {
+        "id": "192dbb3a-8e40-4705-9654-d9fa51ace2fd",
+        "displayName": "Telemetry",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39",
+            "transform": "# The transformation query specified here will be used to change each exported \n# message into a different format. You can get started using the example below,\n# and learn more about the language in documentation:\n# https://aka.ms/dataexporttransformation\n{\n    schema: \"default@v1\",\n    applicationId: .applicationId,\n    deviceId: .device.id,\n    templateId: .device.templateId,\n    messageSource: .messageSource,\n    enqueuedTime: .enqueuedTime,\n    telemetry: .telemetry | map({ key: .name, value: .value }) | from_entries,\n    messageProperties: .messageProperties,\n    enrichments: .enrichments,\n    component: .component,\n    cloudProperties: .cloudProperties,\n    module: .module\n}"
+          }
+        ],
+        "status": "healthy"
+      },
+      {
+        "id": "2d0cf374-d005-4ddf-a7cf-28f4b17c8375",
+        "displayName": "Delete1",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "healthy"
+      },
+      {
+        "id": "693be51f-686d-42e8-ab0e-3d566e59aac5",
+        "displayName": "Delete2-Updated",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "healthy"
+      },
+      {
+        "id": "df3a7e16-5e21-4106-a3a0-06e7f46ed26a",
+        "displayName": "Properties",
+        "enabled": true,
+        "source": "properties",
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "healthy"
+      },
+      {
+        "id": "e328c80b-ff83-45b9-9858-bf0d18986826",
+        "displayName": "Delete1",
+        "enabled": true,
+        "source": "telemetry",
+        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
+        "enrichments": {
+          "Foo": {
+            "target": "dtmi:nerf:NerfGun_79h;2",
+            "path": "BuzzerEnabled"
+          },
+          "Region": {
+            "value": "US"
+          }
+        },
+        "destinations": [
+          {
+            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
+          }
+        ],
+        "status": "healthy"
+      }
+    ]
+  },
+  "APITokens": {
+    "value": [
+      {
+        "id": "hangyi-test-cicd",
+        "roles": [
+          {
+            "role": "ca310b8d-2f4a-44e0-a36e-957c202cd8d4"
+          }
+        ],
+        "expiry": "2023-02-15T23:08:57.887Z"
+      },
+      {
+        "id": "troy",
+        "roles": [
+          {
+            "role": "ca310b8d-2f4a-44e0-a36e-957c202cd8d4"
+          }
+        ],
+        "expiry": "2023-02-15T23:59:03.46Z"
+      },
+      {
+        "id": "shivanipatel222",
+        "roles": [
+          {
+            "role": "ca310b8d-2f4a-44e0-a36e-957c202cd8d4"
+          }
+        ],
+        "expiry": "2023-02-16T00:08:15.339Z"
+      }
+    ]
   },
   "jobs": {
     "value": [
@@ -108,243 +281,6 @@
           }
         ],
         "status": "complete"
-      },
-      {
-        "id": "21df26f2-bec8-4270-9447-bb09e814c1eb",
-        "displayName": "Arm Gun - PS",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "c2186dbe-db2e-420a-b322-2a792daf3c66",
-        "displayName": "Arm Gun - PS",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "c4ebf156-d424-46fd-bf4a-af3a26da4983",
-        "displayName": "Arm Gun - PS",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "006cfe7d-2b4e-4123-b7f5-cb67526e0a1e",
-        "displayName": "Arm Gun - PS",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "f2e5a8b1-4ce0-4dae-8670-3404429348f7",
-        "displayName": "Arm Gun - PS",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "741d371d-f414-40c8-b117-8e5cbbab1365",
-        "displayName": "Arm Gun - 3",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "8d6a92c9-f76a-4de4-b8e3-4172bf505b3e",
-        "displayName": "Arm Gun - 2",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      },
-      {
-        "id": "f8c805af-51fd-40d9-a505-ddbabd500a5f",
-        "displayName": "Arm Gun - 1",
-        "description": "",
-        "group": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "data": [
-          {
-            "type": "command",
-            "target": "dtmi:modelDefinition:biw671hp:z4ass7fr601",
-            "path": "Arm"
-          }
-        ],
-        "status": "complete"
-      }
-    ]
-  },
-  "device groups": {
-    "value": [
-      {
-        "id": "48644781-d4cb-4945-9d94-e817e1b50150",
-        "displayName": "Nerf Gun - All devices"
-      },
-      {
-        "id": "7175cc46-a239-4179-b8b3-13dd96720957",
-        "displayName": "Nerf Gun v2 - All devices"
-      },
-      {
-        "id": "17ef06dd-0042-4245-b3be-7728029f9af0",
-        "displayName": "undefined - All devices"
-      },
-      {
-        "id": "c6d52600-eb8c-4511-b25c-46bf207ddf7b",
-        "displayName": "Test Definition2 - All devices"
-      }
-    ]
-  },
-  "data exports": {
-    "value": [
-      {
-        "id": "192dbb3a-8e40-4705-9654-d9fa51ace2fd",
-        "displayName": "Telemetry",
-        "enabled": true,
-        "source": "telemetry",
-        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
-        "enrichments": {
-          "Foo": {
-            "target": "dtmi:nerf:NerfGun_79h;2",
-            "path": "BuzzerEnabled"
-          },
-          "Region": {
-            "value": "US"
-          }
-        },
-        "destinations": [
-          {
-            "id": "8e46792d-c026-44f8-9001-668ad20dea39",
-            "transform": "# The transformation query specified here will be used to change each exported \n# message into a different format. You can get started using the example below,\n# and learn more about the language in documentation:\n# https://aka.ms/dataexporttransformation\n{\n    schema: \"default@v1\",\n    applicationId: .applicationId,\n    deviceId: .device.id,\n    templateId: .device.templateId,\n    messageSource: .messageSource,\n    enqueuedTime: .enqueuedTime,\n    telemetry: .telemetry | map({ key: .name, value: .value }) | from_entries,\n    messageProperties: .messageProperties,\n    enrichments: .enrichments,\n    component: .component,\n    cloudProperties: .cloudProperties,\n    module: .module\n}"
-          }
-        ],
-        "status": "degraded"
-      },
-      {
-        "id": "2d0cf374-d005-4ddf-a7cf-28f4b17c8375",
-        "displayName": "Delete1",
-        "enabled": true,
-        "source": "telemetry",
-        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
-        "enrichments": {
-          "Foo": {
-            "target": "dtmi:nerf:NerfGun_79h;2",
-            "path": "BuzzerEnabled"
-          },
-          "Region": {
-            "value": "US"
-          }
-        },
-        "destinations": [
-          {
-            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
-          }
-        ],
-        "status": "degraded"
-      },
-      {
-        "id": "693be51f-686d-42e8-ab0e-3d566e59aac5",
-        "displayName": "Delete2-Updated",
-        "enabled": true,
-        "source": "telemetry",
-        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
-        "enrichments": {
-          "Foo": {
-            "target": "dtmi:nerf:NerfGun_79h;2",
-            "path": "BuzzerEnabled"
-          },
-          "Region": {
-            "value": "US"
-          }
-        },
-        "destinations": [
-          {
-            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
-          }
-        ],
-        "status": "degraded"
-      },
-      {
-        "id": "df3a7e16-5e21-4106-a3a0-06e7f46ed26a",
-        "displayName": "Properties",
-        "enabled": true,
-        "source": "properties",
-        "destinations": [
-          {
-            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
-          }
-        ],
-        "status": "degraded"
-      },
-      {
-        "id": "e328c80b-ff83-45b9-9858-bf0d18986826",
-        "displayName": "Delete1",
-        "enabled": true,
-        "source": "telemetry",
-        "filter": "SELECT * FROM devices WHERE $id != \"Foo\"",
-        "enrichments": {
-          "Foo": {
-            "target": "dtmi:nerf:NerfGun_79h;2",
-            "path": "BuzzerEnabled"
-          },
-          "Region": {
-            "value": "US"
-          }
-        },
-        "destinations": [
-          {
-            "id": "8e46792d-c026-44f8-9001-668ad20dea39"
-          }
-        ],
-        "status": "degraded"
       }
     ]
   }
