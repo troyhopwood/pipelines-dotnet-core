@@ -141,33 +141,31 @@ else{
             $SecretName = "Undefined"
 
             switch($ConfigObj.type){
-                "webhook@v1" {
-                    if($Config.headerCustomizations.secret -ne $false){
-                        $SecretName = $ConfigObj.headerCustomizations.secret
-                        $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
-                        $ConfigObj.headerCustomizations.secret = $Secret
+                    "webhook@v1" {
+                        if($ConfigObj.headerCustomizations."x-custom-region".secret -ne $false){
+                            $SecretName = $ConfigObj.headerCustomizations."x-custom-region".secret
+                            $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
+                            $ConfigObj.headerCustomizations."x-custom-region".secret = $Secret
+                        }
+                        Break
                     }
-                    Break
+                    "dataexplorer@v1" {
+                        $SecretName = $ConfigObj.authorization.clientSecret
+                        $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
+                        $ResultObj = $Result | ConvertFrom-Json
+                        $Secret = $ResultObj.value
+                        $ConfigObj.authorization.clientSecret = $Secret
+                        Break
+                    }
+                    Default {
+                        $SecretName = $ConfigObj.authorization.connectionString
+                        $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
+                        $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
+                        $ResultObj = $Result | ConvertFrom-Json
+                        $Secret = $ResultObj.value
+                        $ConfigObj.authorization.connectionString = $Secret
+                    }
                 }
-                "dataexplorer@v1" {
-                    Write-Host "Authorization: " $ConfigObj.authorization
-                    $SecretName = $ConfigObj.authorization.clientSecret
-                    Write-Host "Secret name: $SecretName"
-                    $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
-                    $ResultObj = $Result | ConvertFrom-Json
-                    $Secret = $ResultObj.value
-                    $ConfigObj.authorization.clientSecret = $Secret
-                    Break
-                }
-                Default {
-                    $SecretName = $ConfigObj.authorization.connectionString
-                    $Secret = az keyvault secret show --vault-name $VaultName --name $SecretName
-                    $Result = az keyvault secret show --vault-name $VaultName --name $SecretName
-                    $ResultObj = $Result | ConvertFrom-Json
-                    $Secret = $ResultObj.value
-                    $ConfigObj.authorization.connectionString = $Secret
-                }
-            }
 
             $Config = $ConfigObj | ConvertTo-Json -Depth 100 -Compress
 
